@@ -1,0 +1,224 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #05081c;
+  --color-navy-900: #0a0f2c;
+  --color-navy-800: #0d1434;
+  --color-navy-700: #131c46;
+  --color-navy-600: #1b2763;
+  --color-electric-300: #7db0ff;
+  --color-electric-400: #4d8dff;
+  --color-electric-500: #1e6fff;
+  --color-electric-600: #1256dd;
+  --color-ink-100: #eef2ff;
+  --color-ink-300: #c3cdf2;
+  --color-ink-400: #a2aede;
+  --color-ink-500: #7c89bb;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  background-color: var(--color-navy-900);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-electric-500);
+  color: #ffffff;
+}
+
+/* ---------- scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-navy-950);
+}
+::-webkit-scrollbar-thumb {
+  background: #26336e;
+  border-radius: 8px;
+  border: 2px solid var(--color-navy-950);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-electric-500);
+}
+
+/* ---------- gradient text ---------- */
+.text-gradient {
+  background: linear-gradient(92deg, #9cc2ff 0%, #1e6fff 45%, #3fd1ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- scroll reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  filter: blur(8px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ---------- marquee ---------- */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 34s linear infinite;
+  will-change: transform;
+}
+
+/* ---------- floating elements ---------- */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.float-slow { animation: float-y 7s ease-in-out infinite; }
+.float-slower { animation: float-y 9s ease-in-out 1.2s infinite; }
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(30, 111, 255, 0.55); }
+  50% { box-shadow: 0 0 0 7px rgba(30, 111, 255, 0); }
+}
+.pulse-dot { animation: pulse-dot 2.4s ease-out infinite; }
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mobile-menu { animation: menu-in 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* ---------- hero background grid ---------- */
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(148, 178, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 178, 255, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 18%, black 25%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 18%, black 25%, transparent 72%);
+}
+
+/* ---------- film grain ---------- */
+.noise-layer {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+/* ---------- nav link underline ---------- */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  height: 1.5px;
+  width: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #1e6fff, #3fd1ff);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------- primary button glow ---------- */
+.btn-primary {
+  box-shadow: 0 10px 32px -8px rgba(30, 111, 255, 0.65);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 16px 48px -10px rgba(30, 111, 255, 0.85);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ---------- pricing card blue glow ---------- */
+.pricing-card {
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s ease,
+    border-color 0.5s ease;
+}
+.pricing-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(30, 111, 255, 0.55);
+  box-shadow:
+    0 28px 90px -18px rgba(30, 111, 255, 0.45),
+    0 0 0 1px rgba(30, 111, 255, 0.22) inset,
+    0 0 44px -8px rgba(30, 111, 255, 0.35);
+}
+
+/* ---------- generic service card hover ---------- */
+.hover-card {
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.5s ease,
+    box-shadow 0.5s ease,
+    background-color 0.5s ease;
+}
+.hover-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(30, 111, 255, 0.4);
+  box-shadow: 0 24px 64px -24px rgba(30, 111, 255, 0.35);
+}
+
+/* ---------- form focus ---------- */
+.form-field {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+.form-field:focus {
+  outline: none;
+  border-color: rgba(30, 111, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(30, 111, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.045);
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .marquee-track,
+  .float-slow,
+  .float-slower,
+  .pulse-dot,
+  .mobile-menu {
+    animation: none;
+  }
+}

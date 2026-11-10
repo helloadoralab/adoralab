@@ -1,0 +1,5389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <title>Adora Lab — AI Commercial &amp; UGC Content Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #07090e;
+      --deep-navy: #0a0f2c;
+      --accent-orange: #ff5722;
+      --accent-orange-hover: #f4511e;
+      --accent-blue: #1e6fff;
+      --accent-blue-hover: #1557d0;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-hover: #0891b2;
+      --accent-glow: rgba(30, 111, 255, 0.65);
+      --text-white: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.85);
+      --text-dim: rgba(255, 255, 255, 0.55);
+    }
+
+    html {
+      background: var(--bg);
+      color: var(--text-white);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: transparent;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.5); }
+
+    /* ═══ FIXED FULL-SCREEN CANVAS BACKGROUND ═══ */
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    #canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      display: block;
+    }
+    .canvas-vignette {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 80% at 50% 45%, rgba(7,9,14,0.02) 0%, rgba(7,9,14,0.48) 100%),
+        linear-gradient(180deg, rgba(7,9,14,0.3) 0%, transparent 18%, transparent 82%, rgba(7,9,14,0.85) 100%);
+      pointer-events: none;
+    }
+
+    /* Clean full-screen fixed studio dark tint overlay directly over scroll background */
+    .bg-dark-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    /* ═══ 1. TOP PILL NAVBAR ═══ */
+    .nav-pill-wrapper {
+      position: sticky;
+      top: 16px;
+      z-index: 1000;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 0 20px;
+      pointer-events: none;
+    }
+
+    .pill-navbar {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 7px 14px 7px 8px;
+      background: rgba(10, 16, 34, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(120, 180, 255, 0.22);
+      border-radius: 9999px;
+      box-shadow: 
+        0 14px 38px rgba(0, 0, 0, 0.6),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        inset 0 -10px 20px -8px rgba(30, 111, 255, 0.4);
+      max-width: 860px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .pill-navbar:hover {
+      border-color: rgba(140, 200, 255, 0.4);
+      box-shadow: 
+        0 18px 45px rgba(0, 0, 0, 0.7),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -12px 24px -6px rgba(30, 111, 255, 0.55);
+    }
+
+    .pill-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .pill-logo-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1.5px solid rgba(30, 111, 255, 0.6);
+      box-shadow: 0 0 14px rgba(30, 111, 255, 0.5);
+      flex-shrink: 0;
+    }
+
+    .pill-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .pill-brand-text {
+      font-size: 14.5px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    .pill-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-pill-item {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 7px 15px;
+      border-radius: 9999px;
+      transition: all 0.22s ease;
+      letter-spacing: 0.01em;
+      border: 1px solid transparent;
+    }
+
+    .nav-pill-item:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .nav-pill-item.active-pill {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    }
+
+    .pill-menu-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #fff;
+    }
+
+    .pill-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 12px rgba(30, 111, 255, 0.4);
+    }
+
+    .pill-menu-btn span {
+      display: block;
+      width: 16px;
+      height: 2px;
+      background: #ffffff;
+      border-radius: 2px;
+      transition: 0.2s;
+    }
+
+    /* ═══ GLASSMORPHIC STUDIO DRAWER ═══ */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(4, 7, 18, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    .drawer-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .studio-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 420px;
+      z-index: 10001;
+      background: rgba(10, 15, 44, 0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-left: 1.5px solid rgba(120, 180, 255, 0.38);
+      box-shadow: -20px 0 60px rgba(0, 0, 0, 0.85), -2px 0 25px rgba(30, 111, 255, 0.45);
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 26px 24px;
+      gap: 20px;
+    }
+
+    .studio-drawer.active {
+      transform: translateX(0);
+    }
+
+    /* Drawer Header */
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .drawer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .drawer-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 12px rgba(30, 111, 255, 0.3);
+    }
+
+    .drawer-close-btn:hover {
+      background: #ff5722;
+      border-color: #ff8a65;
+      transform: rotate(90deg);
+      box-shadow: 0 0 16px rgba(255, 87, 34, 0.7);
+    }
+
+    /* Drawer Cards */
+    .drawer-glass-card {
+      border-radius: 20px;
+      padding: 20px;
+      background: rgba(14, 22, 54, 0.7);
+      border: 1.5px solid rgba(120, 180, 255, 0.25);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    }
+
+    .drawer-card-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      text-shadow: 0 0 14px rgba(56, 189, 248, 0.85);
+      margin-bottom: 8px;
+    }
+
+    .founder-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .founder-subtext {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    /* Workflow Steps */
+    .workflow-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .workflow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .workflow-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .step-num {
+      font-size: 12px;
+      font-weight: 800;
+      color: #38bdf8;
+      background: rgba(30, 111, 255, 0.2);
+      padding: 3px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      flex-shrink: 0;
+    }
+
+    .delivery-time-pill {
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(30, 111, 255, 0.18);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #e0f2fe;
+    }
+
+    .delivery-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    /* Quick Jump Links */
+    .drawer-nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .drawer-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .drawer-nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 13.5px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .drawer-nav-link:hover {
+      background: rgba(30, 111, 255, 0.18);
+      border-color: rgba(120, 180, 255, 0.4);
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+
+    .drawer-cta-btn {
+      width: 100%;
+      padding: 13px 0;
+      border-radius: 9999px;
+      border: none;
+      background: linear-gradient(135deg, #1e6fff 0%, #06b6d4 100%);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(30, 111, 255, 0.55);
+      transition: all 0.25s ease;
+      margin-top: 6px;
+    }
+
+    .drawer-cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(30, 111, 255, 0.8);
+    }
+
+    .drawer-social-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      border-radius: 9999px;
+      background: rgba(14, 22, 54, 0.65);
+      border: 1px solid rgba(120, 180, 255, 0.25);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .drawer-social-pill:hover {
+      background: rgba(30, 111, 255, 0.2);
+      border-color: #38bdf8;
+      box-shadow: 0 0 18px rgba(30, 111, 255, 0.4);
+    }
+
+    /* ═══ PAGE WRAPPER ═══ */
+    .page {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+    }
+
+    .section-wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 50px 24px;
+      position: relative;
+    }
+
+    .section-header-center {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 36px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      text-shadow: 0 0 18px rgba(56, 189, 248, 0.85);
+      margin-bottom: 10px;
+      padding: 4px 14px;
+      background: rgba(30, 111, 255, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 9999px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      text-shadow: 0 4px 24px rgba(0,0,0,0.9);
+      margin-bottom: 10px;
+      line-height: 1.15;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.55;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       2. HERO & FROSTED GLASS BASKET / FOLDER (ALL-MEDIA VAULT)
+    ════════════════════════════════════════════════════════════════ */
+    .hero-section {
+      padding: 40px 24px 60px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      z-index: 2;
+    }
+
+    .hero-heading {
+      font-size: clamp(34px, 4.6vw, 58px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.035em;
+      color: #ffffff;
+      margin-bottom: 18px;
+      text-shadow: 0 4px 30px rgba(0, 0, 0, 0.95);
+    }
+
+    .hero-heading .explore-sub {
+      display: block;
+      font-size: clamp(20px, 2.4vw, 32px);
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+    }
+
+    .hero-heading .highlight-ai {
+      display: block;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(95deg, #ffffff 0%, #d0f0ff 40%, #56b9ff 85%, #ffffff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+    }
+
+    .hero-heading .portfolio-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      color: #ffffff;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
+    }
+
+    .electric-star-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #60a5fa 0%, #1e6fff 60%, #0d388f 100%);
+      border: 2px solid #93c5fd;
+      box-shadow: 
+        0 0 24px rgba(30, 111, 255, 0.9),
+        0 0 45px rgba(56, 189, 248, 0.5),
+        inset 0 2px 4px rgba(255, 255, 255, 0.7);
+      flex-shrink: 0;
+      animation: badgePulse 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes badgePulse {
+      0% { transform: scale(1); box-shadow: 0 0 20px rgba(30, 111, 255, 0.8); }
+      100% { transform: scale(1.08); box-shadow: 0 0 32px rgba(56, 189, 248, 1); }
+    }
+
+    .electric-star-badge svg {
+      width: 24px;
+      height: 24px;
+      fill: #ffffff;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+
+    .badge-ribbons {
+      position: absolute;
+      bottom: -10px;
+      width: 20px;
+      height: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 2px;
+    }
+    .badge-ribbon-tail {
+      width: 8px;
+      height: 12px;
+      background: linear-gradient(180deg, #1e6fff, #0d388f);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+    }
+
+    .hero-desc {
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 580px;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+    }
+
+    .hero-btn-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 34px;
+    }
+
+    .pill-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px 10px 22px;
+      border-radius: 9999px;
+      background: rgba(30, 111, 255, 0.22);
+      border: 1.5px solid rgba(120, 180, 255, 0.4);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 700;
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.4),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        0 0 20px rgba(30, 111, 255, 0.4);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .pill-action-btn:hover {
+      background: rgba(30, 111, 255, 0.45);
+      border-color: rgba(140, 200, 255, 0.8);
+      box-shadow: 0 10px 30px rgba(30, 111, 255, 0.7);
+      transform: translateY(-2px);
+    }
+
+    .arrow-icon-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #0b1536;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      transition: transform 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .pill-action-btn:hover .arrow-icon-circle {
+      transform: translateX(3px) rotate(45deg);
+    }
+
+    /* 3D Basket / Folder */
+    .folder-3d-wrap {
+      width: 100%;
+      max-width: 540px;
+      position: relative;
+      perspective: 1200px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .folder-stage {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .folder-back-wall {
+      position: absolute;
+      bottom: 0;
+      width: 92%;
+      height: 210px;
+      border-radius: 24px 24px 18px 18px;
+      background: rgba(12, 20, 44, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(120, 180, 255, 0.25);
+      box-shadow: 
+        0 20px 45px rgba(0,0,0,0.6),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    }
+
+    .folder-back-tab {
+      display: none !important;
+    }
+
+    .folder-fan-posters {
+      position: absolute;
+      bottom: 45px;
+      width: 100%;
+      height: 220px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      pointer-events: auto;
+      z-index: 3;
+    }
+
+    .fan-poster-card {
+      position: absolute;
+      bottom: 0;
+      width: 125px;
+      height: 175px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0d152a;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 
+        0 14px 30px rgba(0, 0, 0, 0.7),
+        0 0 18px rgba(30, 111, 255, 0.35);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: bottom center;
+    }
+
+    .fan-poster-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .fan-poster-card:hover img {
+      transform: scale(1.08);
+    }
+
+    .fan-card-1 { transform: translateX(-110px) rotate(-14deg) translateY(10px); z-index: 1; }
+    .fan-card-2 { transform: translateX(-38px) rotate(-5deg) translateY(-2px); z-index: 2; }
+    .fan-card-3 { transform: translateX(38px) rotate(5deg) translateY(-2px); z-index: 3; }
+    .fan-card-4 { transform: translateX(110px) rotate(14deg) translateY(10px); z-index: 4; }
+
+    .folder-3d-wrap:hover .fan-card-1 { transform: translateX(-145px) rotate(-20deg) translateY(-26px); }
+    .folder-3d-wrap:hover .fan-card-2 { transform: translateX(-50px) rotate(-7deg) translateY(-38px); }
+    .folder-3d-wrap:hover .fan-card-3 { transform: translateX(50px) rotate(7deg) translateY(-38px); }
+    .folder-3d-wrap:hover .fan-card-4 { transform: translateX(145px) rotate(20deg) translateY(-26px); }
+
+    .fan-poster-card:hover {
+      z-index: 10 !important;
+      border-color: #38bdf8;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9), 0 0 30px #1e6fff;
+    }
+
+    .folder-front-flap {
+      position: absolute;
+      bottom: 0;
+      width: 96%;
+      height: 155px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(30, 111, 255, 0.22) 40%, rgba(8, 14, 36, 0.78) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(140, 200, 255, 0.38);
+      box-shadow: 
+        0 16px 40px rgba(0, 0, 0, 0.7),
+        inset 0 1px 2px rgba(255, 255, 255, 0.45),
+        inset 0 -22px 35px -10px rgba(30, 111, 255, 0.65);
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .folder-front-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.95;
+    }
+
+    .folder-front-logo-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 3px;
+      box-shadow: 0 0 20px rgba(30, 111, 255, 0.6);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .folder-front-logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .folder-front-brand-text {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+    }
+
+    .folder-hint-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #38bdf8;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .folder-experience-badge,
+    .adora-basket .folder-experience-badge {
+      position: absolute;
+      top: -18px;
+      right: 18px;
+      background: linear-gradient(135deg, #38bdf8 0%, #1e6fff 60%, #0d388f 100%);
+      border: 1.5px solid #93c5fd;
+      border-radius: 10px;
+      padding: 8px 16px;
+      color: #ffffff;
+      box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.45),
+        0 8px 24px rgba(30, 111, 255, 0.8),
+        inset 0 1px 2px rgba(255, 255, 255, 0.6);
+      transform: rotate(8deg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      z-index: 15;
+      pointer-events: auto;
+    }
+
+    .badge-exp-number {
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .badge-exp-text {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #e0f2fe;
+      margin-top: 2px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       HERO RIGHT: RIGHT-SIDE 'BRAND POSTER SHOWCASE' CARD (8-POSTER CAROUSEL)
+    ════════════════════════════════════════════════════════════════ */
+    .hero-right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .hero-preview-card {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 10 / 14;
+      border-radius: 28px;
+      position: relative;
+      background: rgba(10, 16, 36, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(120, 180, 255, 0.32);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.75),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -24px 40px -10px rgba(30, 111, 255, 0.6);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    .hero-preview-slider {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: pan-y;
+      cursor: grab;
+    }
+
+    .hero-preview-slider:active {
+      cursor: grabbing;
+    }
+
+    .preview-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: scale(1.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .preview-slide.active {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .preview-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-expand-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(10, 16, 36, 0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    .preview-expand-btn:hover {
+      background: #1e6fff;
+      border-color: #60a5fa;
+      transform: scale(1.1) rotate(45deg);
+      box-shadow: 0 0 20px #1e6fff;
+    }
+
+    .carousel-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(8, 14, 32, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+      font-size: 16px;
+    }
+
+    .carousel-nav-btn:hover {
+      background: #1e6fff;
+      border-color: #60a5fa;
+      box-shadow: 0 0 16px rgba(30, 111, 255, 0.7);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .carousel-nav-btn.prev-btn { left: 14px; }
+    .carousel-nav-btn.next-btn { right: 14px; }
+
+    .preview-card-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 20px 18px;
+      background: linear-gradient(180deg, transparent 0%, rgba(6, 10, 24, 0.88) 55%, rgba(6, 10, 24, 0.98) 100%);
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .preview-meta-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+
+    .preview-meta-dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .preview-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .preview-dot.active {
+      width: 22px;
+      border-radius: 10px;
+      background: #38bdf8;
+      box-shadow: 0 0 10px #38bdf8;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       3. MIDDLE 3-CARD FOCUS CAROUSEL (CINEMATIC FLAGSHIP SHOWCASE)
+    ════════════════════════════════════════════════════════════════ */
+    .showcase-section {
+      padding: 70px 24px 60px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .flagship-carousel-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      position: relative;
+      margin: 0 auto;
+      max-width: 1100px;
+      perspective: 1200px;
+    }
+
+    .flagship-card {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      background: rgba(8, 14, 36, 0.65);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1.5px solid rgba(120, 180, 255, 0.28);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.7),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35);
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .flagship-card.side-card {
+      width: 290px;
+      height: 480px;
+      opacity: 0.65;
+      transform: scale(0.92);
+      filter: brightness(0.85);
+      cursor: pointer;
+    }
+
+    .flagship-card.side-card.left-card {
+      transform: perspective(1000px) rotateY(10deg) scale(0.92);
+    }
+
+    .flagship-card.side-card.right-card {
+      transform: perspective(1000px) rotateY(-10deg) scale(0.92);
+    }
+
+    .flagship-card.side-card:hover {
+      opacity: 0.95;
+      filter: brightness(1);
+      border-color: rgba(140, 200, 255, 0.6);
+      transform: scale(0.96);
+      box-shadow: 0 28px 65px rgba(0, 0, 0, 0.8), 0 0 30px rgba(30, 111, 255, 0.4);
+    }
+
+    .flagship-card.center-main {
+      width: 360px;
+      height: 560px;
+      z-index: 10;
+      border-color: rgba(140, 200, 255, 0.5);
+      box-shadow: 
+        0 30px 80px rgba(0, 0, 0, 0.85),
+        inset 0 -28px 45px -10px rgba(30, 111, 255, 0.8),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5),
+        0 0 40px rgba(30, 111, 255, 0.35);
+      transform: scale(1.02);
+    }
+
+    .flagship-card.center-main:hover {
+      transform: scale(1.04) translateY(-4px);
+      box-shadow: 
+        0 36px 90px rgba(0, 0, 0, 0.9),
+        inset 0 -32px 50px -8px rgba(30, 111, 255, 0.95),
+        0 0 50px rgba(30, 111, 255, 0.5);
+    }
+
+    .video-frame-box {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 26px;
+      overflow: hidden;
+      background: #000000;
+      cursor: pointer;
+    }
+
+    .video-frame-box video,
+    .vault-media-box video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 24px;
+      display: block;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    /* Glassmorphic Play/Pause + Audio Toggle Pill */
+    .video-glass-ctrl-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      background: rgba(8, 14, 36, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.2px solid rgba(140, 200, 255, 0.45);
+      border-radius: 9999px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+      user-select: none;
+    }
+
+    .video-glass-ctrl-btn:hover {
+      background: rgba(30, 111, 255, 0.88);
+      border-color: rgba(255, 255, 255, 0.8);
+      transform: translateX(-50%) scale(1.06);
+      box-shadow: 0 14px 32px rgba(30, 111, 255, 0.65), 0 0 25px rgba(56, 189, 248, 0.6);
+    }
+
+    .video-glass-ctrl-btn.is-playing {
+      background: rgba(30, 111, 255, 0.92);
+      border-color: rgba(56, 189, 248, 0.85);
+      box-shadow: 0 0 28px rgba(30, 111, 255, 0.75);
+    }
+
+    .video-glass-ctrl-btn svg {
+      display: block;
+    }
+
+    .showcase-footer-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      margin-top: 36px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .view-all-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 34px;
+      border-radius: 9999px;
+      background: rgba(18, 28, 54, 0.65);
+      border: 1.5px solid rgba(120, 180, 255, 0.35);
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 700;
+      text-decoration: none;
+      backdrop-filter: blur(14px);
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0 -10px 20px -8px rgba(30, 111, 255, 0.4);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .view-all-pill-btn:hover {
+      background: rgba(30, 111, 255, 0.35);
+      border-color: rgba(140, 200, 255, 0.8);
+      box-shadow: 0 12px 35px rgba(30, 111, 255, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .down-nav-arrow-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .down-nav-arrow-btn:hover {
+      background: #1e6fff;
+      color: #ffffff;
+      transform: translateY(3px);
+      box-shadow: 0 0 15px #1e6fff;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       4. BOTTOM SEMI-CIRCULAR ARC SECTION (UGC ESSENTIALS SHOWCASE)
+    ════════════════════════════════════════════════════════════════ */
+    .ugc-arc-section {
+      padding: 70px 24px 80px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+      overflow: visible;
+    }
+
+    .arc-stage-container {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      height: 620px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .arc-svg-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .arc-neon-path {
+      fill: none;
+      stroke: #1e6fff;
+      stroke-width: 5;
+      filter: drop-shadow(0 0 16px #1e6fff) drop-shadow(0 0 35px #38bdf8);
+    }
+
+    .arc-inner-path {
+      fill: none;
+      stroke: rgba(56, 189, 248, 0.45);
+      stroke-width: 2;
+      stroke-dasharray: 6 6;
+    }
+
+    .arc-radial-glow {
+      position: absolute;
+      bottom: 40px;
+      width: 700px;
+      height: 380px;
+      border-radius: 50% 50% 0 0;
+      background: radial-gradient(ellipse 65% 55% at 50% 90%, rgba(30, 111, 255, 0.35) 0%, rgba(6, 182, 212, 0.15) 45%, transparent 75%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .arc-cards-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+    }
+
+    .ugc-card {
+      position: absolute;
+      border-radius: 26px;
+      overflow: hidden;
+      background: rgba(8, 14, 36, 0.72);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1.5px solid rgba(120, 180, 255, 0.35);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.75),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -24px 40px -10px rgba(30, 111, 255, 0.65);
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .ugc-card.arc-center {
+      width: 310px;
+      height: 500px;
+      z-index: 10;
+      transform: translateY(-20px);
+      box-shadow: 
+        0 30px 75px rgba(0, 0, 0, 0.85),
+        inset 0 -28px 45px -10px rgba(30, 111, 255, 0.8),
+        0 0 35px rgba(30, 111, 255, 0.45);
+    }
+
+    .ugc-card.arc-center:hover {
+      transform: translateY(-28px) scale(1.03);
+      box-shadow: 
+        0 36px 90px rgba(0, 0, 0, 0.9),
+        0 0 50px rgba(30, 111, 255, 0.7);
+    }
+
+    .ugc-card.arc-left {
+      width: 250px;
+      height: 420px;
+      z-index: 5;
+      transform: translateX(-280px) translateY(30px) rotate(-18deg);
+      opacity: 0.85;
+    }
+
+    .ugc-card.arc-left:hover {
+      opacity: 1;
+      transform: translateX(-290px) translateY(18px) rotate(-14deg) scale(1.05);
+      z-index: 12;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(30, 111, 255, 0.5);
+    }
+
+    .ugc-card.arc-right {
+      width: 250px;
+      height: 420px;
+      z-index: 5;
+      transform: translateX(280px) translateY(30px) rotate(18deg);
+      opacity: 0.85;
+    }
+
+    .ugc-card.arc-right:hover {
+      opacity: 1;
+      transform: translateX(290px) translateY(18px) rotate(14deg) scale(1.05);
+      z-index: 12;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(30, 111, 255, 0.5);
+    }
+
+    .ugc-card-top-arrow {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(10, 16, 36, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .arc-bottom-center-badge {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #1e6fff 0%, #0c204d 70%, #060e22 100%);
+      border: 2.5px solid #60a5fa;
+      box-shadow: 
+        0 0 28px rgba(30, 111, 255, 0.95),
+        0 0 60px rgba(56, 189, 248, 0.6),
+        inset 0 2px 4px rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 15;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: badgeGlowPulse 2.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes badgeGlowPulse {
+      0% { box-shadow: 0 0 24px rgba(30, 111, 255, 0.8), 0 0 45px rgba(56, 189, 248, 0.5); }
+      100% { box-shadow: 0 0 38px rgba(30, 111, 255, 1), 0 0 75px rgba(56, 189, 248, 0.85); transform: translateX(-50%) scale(1.08); }
+    }
+
+    .arc-bottom-center-badge .badge-logo-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ffffff;
+      padding: 2px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       5. PRICING SECTION WITH INTERACTIVE SUB-TIERS
+    ════════════════════════════════════════════════════════════════ */
+    .pricing-section {
+      min-height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 60px 24px 60px;
+      position: relative;
+      width: 100%;
+    }
+
+    .pricing-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .pricing-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      text-shadow: 0 0 18px rgba(56, 189, 248, 0.75);
+      margin-bottom: 12px;
+    }
+
+    .pricing-header h1 {
+      font-size: clamp(32px, 4.4vw, 54px);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      color: #ffffff;
+      text-shadow: 0 4px 24px rgba(0,0,0,0.9);
+      margin-bottom: 12px;
+      line-height: 1.1;
+    }
+
+    .pricing-header p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.55;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+    }
+
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      max-width: 1320px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+      padding-top: 28px;
+      overflow: visible;
+    }
+
+    .glass-card {
+      position: relative;
+      border-radius: 28px;
+      padding: 34px 24px 30px;
+      background: 
+        linear-gradient(rgba(30, 111, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30, 111, 255, 0.04) 1px, transparent 1px),
+        radial-gradient(circle at 50% 105%, rgba(30, 111, 255, 0.55) 0%, rgba(8, 14, 36, 0.42) 60%);
+      background-size: 32px 32px, 32px 32px, 100% 100%;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(120, 180, 255, 0.28);
+      box-shadow: 
+        inset 0 -28px 45px -10px rgba(30, 111, 255, 0.75),
+        inset 0 2px 12px rgba(100, 180, 255, 0.25),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        0 20px 50px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.35s;
+      overflow: visible;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(140, 200, 255, 0.55);
+      box-shadow: 
+        inset 0 -32px 50px -8px rgba(30, 111, 255, 0.88),
+        inset 0 2px 14px rgba(100, 180, 255, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5),
+        0 28px 65px rgba(0, 0, 0, 0.75);
+    }
+
+    .glass-card.starter { border-color: rgba(59, 130, 246, 0.35); }
+    .glass-card.starter:hover { border-color: rgba(96, 165, 250, 0.65); }
+
+    .glass-card.popular {
+      border-color: rgba(120, 180, 255, 0.38);
+      box-shadow: 
+        inset 0 -28px 45px -10px rgba(30, 111, 255, 0.8),
+        inset 0 2px 12px rgba(255, 87, 34, 0.25),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4),
+        0 24px 60px rgba(0, 0, 0, 0.65);
+    }
+    .glass-card.popular:hover {
+      border-color: rgba(255, 120, 80, 0.65);
+      box-shadow: 
+        inset 0 -32px 52px -8px rgba(30, 111, 255, 0.9),
+        inset 0 2px 14px rgba(255, 87, 34, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5),
+        0 30px 70px rgba(0, 0, 0, 0.8);
+    }
+
+    .glass-card.best-value { border-color: rgba(6, 182, 212, 0.38); }
+    .glass-card.best-value:hover { border-color: rgba(34, 211, 238, 0.7); }
+
+    .badge {
+      position: absolute;
+      top: 0;
+      right: 28px;
+      padding: 5px 16px;
+      border-radius: 0 0 10px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .badge-popular {
+      background: var(--accent-orange);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255,87,34,0.5);
+    }
+    .badge-value {
+      background: var(--accent-cyan);
+      color: #06111f;
+      box-shadow: 0 4px 14px rgba(6,182,212,0.5);
+    }
+
+    .card-plan-name {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 6px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.85);
+    }
+
+    .card-plan-desc {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.85);
+    }
+
+    /* ─── Interactive Clickable Sub-Tier Price Blocks ─── */
+    .sub-plan {
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      background: rgba(6, 11, 28, 0.45);
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .sub-plan:hover {
+      background: rgba(30, 111, 255, 0.12);
+      border-color: rgba(120, 180, 255, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .sub-plan.active-tier {
+      background: rgba(30, 111, 255, 0.2);
+      border-color: #38bdf8;
+      box-shadow: 0 0 24px rgba(30, 111, 255, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+
+    .sub-plan-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .sub-plan-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.85);
+    }
+
+    .tier-radio-indicator {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .sub-plan.active-tier .tier-radio-indicator {
+      border-color: #38bdf8;
+      background: #1e6fff;
+      box-shadow: 0 0 10px #38bdf8;
+    }
+
+    .sub-plan.active-tier .tier-radio-indicator::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .sub-plan-price {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .price-amount {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      color: #ffffff;
+      text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+    }
+
+    .price-unit {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.85);
+    }
+
+    .features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text-muted);
+      text-shadow: 0 1px 5px rgba(0,0,0,0.85);
+    }
+
+    .check-icon {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+      margin-top: 1px;
+    }
+    .check-icon.blue { color: var(--accent-blue); }
+    .check-icon.orange { color: var(--accent-orange); }
+    .check-icon.cyan { color: var(--accent-cyan); }
+    .check-icon.white { color: rgba(255,255,255,0.7); }
+
+    .includes-section {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .includes-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.85);
+    }
+
+    .includes-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+
+    .includes-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,0.8);
+      text-shadow: 0 1px 5px rgba(0,0,0,0.85);
+    }
+
+    .includes-list li .inc-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .inc-dot.blue { background: var(--accent-blue); }
+    .inc-dot.orange { background: var(--accent-orange); }
+    .inc-dot.cyan { background: var(--accent-cyan); }
+
+    .cta-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 14px 0;
+      border-radius: 9999px;
+      font-size: 15px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      border: none;
+    }
+
+    .cta-btn.solid-blue {
+      background: var(--accent-blue);
+      color: #ffffff;
+      box-shadow: 0 8px 24px -4px rgba(30, 111, 255, 0.65);
+    }
+    .cta-btn.solid-blue:hover {
+      background: var(--accent-blue-hover);
+      box-shadow: 0 12px 30px -4px rgba(30, 111, 255, 0.85);
+      transform: translateY(-2px);
+    }
+
+    .cta-btn.solid-orange {
+      background: var(--accent-orange);
+      color: #ffffff;
+      box-shadow: 0 8px 24px -4px rgba(255, 87, 34, 0.65);
+    }
+    .cta-btn.solid-orange:hover {
+      background: var(--accent-orange-hover);
+      box-shadow: 0 12px 30px -4px rgba(255, 87, 34, 0.85);
+      transform: translateY(-2px);
+    }
+
+    .cta-btn.solid-cyan {
+      background: var(--accent-cyan);
+      color: #06111f;
+      box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.65);
+    }
+    .cta-btn.solid-cyan:hover {
+      background: var(--accent-cyan-hover);
+      color: #ffffff;
+      box-shadow: 0 12px 30px -4px rgba(6, 182, 212, 0.85);
+      transform: translateY(-2px);
+    }
+
+    .trust-pill-banner {
+      margin-top: 42px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 30px;
+      border-radius: 9999px;
+      background: rgba(14, 18, 30, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.92);
+      text-align: center;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+      position: relative;
+      z-index: 2;
+    }
+
+    .trust-pill-icon {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 12px #38bdf8;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       5B. WHY PARTNER WITH ADORA LAB (#why-us)
+       CRITICAL: 100% transparent wrapper for scroll background
+    ════════════════════════════════════════════════════════════════ */
+    .why-us-section {
+      background: transparent !important;
+      padding: 70px 24px 60px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    .why-us-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      margin-top: 40px;
+    }
+
+    .why-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .why-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .why-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(140, 200, 255, 0.38);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 25px rgba(30, 111, 255, 0.25);
+    }
+
+    .why-card:hover::before {
+      opacity: 1;
+    }
+
+    .why-card-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(30, 111, 255, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #38bdf8;
+      box-shadow: 0 0 16px rgba(30, 111, 255, 0.25);
+    }
+
+    .why-card-title {
+      font-size: 17.5px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      letter-spacing: -0.2px;
+      margin: 0;
+    }
+
+    .why-card-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(226, 232, 255, 0.78);
+      margin: 0;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       5C. FREQUENTLY ASKED QUESTIONS (#faq)
+       CRITICAL: 100% transparent wrapper for scroll background
+    ════════════════════════════════════════════════════════════════ */
+    .faq-section {
+      background: transparent !important;
+      padding: 60px 24px 80px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    .faq-container {
+      max-width: 780px;
+      margin: 40px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .faq-item {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .faq-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(140, 200, 255, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .faq-item.active {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(30, 111, 255, 0.2);
+    }
+
+    .faq-question-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      font-family: inherit;
+      line-height: 1.45;
+    }
+
+    .faq-toggle-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(30, 111, 255, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #38bdf8;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 12px rgba(30, 111, 255, 0.25);
+    }
+
+    .faq-item.active .faq-toggle-icon {
+      background: rgba(30, 111, 255, 0.35);
+      border-color: rgba(56, 189, 248, 0.7);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
+    }
+
+    .faq-answer-wrap {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s ease;
+      padding: 0 24px;
+    }
+
+    .faq-item.active .faq-answer-wrap {
+      max-height: 300px;
+      padding: 0 24px 22px 24px;
+    }
+
+    .faq-answer-text {
+      color: rgba(226, 232, 255, 0.82);
+      font-size: 14.5px;
+      line-height: 1.65;
+      margin: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 14px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       6. TWIN GLASSMORHPIC CONTACT SECTION (#contact)
+       ════════════════════════════════════════════════════════════════ */
+    .contact-section {
+      padding: 70px 24px 90px;
+      max-width: 1320px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 32px;
+      align-items: stretch;
+    }
+
+    .contact-left-card {
+      border-radius: 28px;
+      padding: 42px 36px;
+      background: rgba(10, 15, 44, 0.78);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1.5px solid rgba(120, 180, 255, 0.3);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.75),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -28px 45px -10px rgba(30, 111, 255, 0.7);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .contact-left-header h2 {
+      font-size: clamp(32px, 3.8vw, 46px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-bottom: 14px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.85);
+    }
+
+    .contact-left-header p {
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: 34px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.85);
+    }
+
+    .trust-badges-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .trust-badge-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: 18px;
+      background: rgba(12, 20, 48, 0.65);
+      border: 1px solid rgba(120, 180, 255, 0.22);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .trust-badge-item:hover {
+      border-color: #38bdf8;
+      background: rgba(30, 111, 255, 0.15);
+      transform: translateX(4px);
+      box-shadow: 0 10px 28px rgba(30, 111, 255, 0.3);
+    }
+
+    .trust-badge-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.8));
+    }
+
+    .trust-badge-text {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    }
+
+    .priority-slot-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 9999px;
+      background: rgba(30, 111, 255, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      font-size: 13px;
+      font-weight: 700;
+      color: #e0f2fe;
+      width: fit-content;
+    }
+
+    .priority-dot-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: slotPulse 2s infinite;
+    }
+
+    @keyframes slotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .contact-right-card {
+      border-radius: 28px;
+      padding: 38px 34px;
+      background: rgba(10, 15, 44, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1.5px solid rgba(120, 180, 255, 0.32);
+      box-shadow: 
+        0 24px 60px rgba(0, 0, 0, 0.75),
+        inset 0 1px 2px rgba(255, 255, 255, 0.35),
+        inset 0 -28px 45px -10px rgba(30, 111, 255, 0.75);
+    }
+
+    .locked-plan-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 20px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(30, 111, 255, 0.28) 0%, rgba(6, 182, 212, 0.18) 100%);
+      border: 1.5px solid #38bdf8;
+      box-shadow: 0 0 24px rgba(30, 111, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+      margin-bottom: 22px;
+      transition: all 0.3s ease;
+    }
+
+    .locked-plan-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+
+    .locked-check-icon {
+      color: #38bdf8;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .dark-glass-input, .dark-glass-select, .dark-glass-textarea {
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: 9999px;
+      background: rgba(6, 11, 28, 0.75);
+      border: 1.5px solid rgba(120, 180, 255, 0.25);
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .dark-glass-textarea {
+      border-radius: 20px;
+      min-height: 105px;
+      resize: vertical;
+    }
+
+    .dark-glass-input:focus, .dark-glass-select:focus, .dark-glass-textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.5);
+      background: rgba(8, 14, 36, 0.9);
+    }
+
+    .btn-send-message {
+      width: 100%;
+      padding: 15px 0;
+      border-radius: 9999px;
+      border: none;
+      background: linear-gradient(135deg, #1e6fff 0%, #06b6d4 100%);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(30, 111, 255, 0.6);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .btn-send-message:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 38px rgba(30, 111, 255, 0.85);
+      background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+    }
+
+    .btn-send-message:disabled {
+      opacity: 0.68;
+      cursor: not-allowed !important;
+      pointer-events: none;
+      transform: none !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* Confirmation Toast */
+    .confirmation-toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000000;
+      padding: 18px 24px;
+      border-radius: 18px;
+      background: rgba(6, 14, 38, 0.95);
+      border: 1.5px solid #38bdf8;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(30, 111, 255, 0.75);
+      color: #ffffff;
+      display: none;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      max-width: 440px;
+      animation: toastSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes toastSlideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .confirmation-toast.show {
+      display: flex;
+    }
+
+    .toast-check-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 16px;
+      flex-shrink: 0;
+      box-shadow: 0 0 15px #10b981;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       7. CLEAN MINIMAL SINGLE-LINE FOOTER
+    ════════════════════════════════════════════════════════════════ */
+    .site-footer {
+      position: relative;
+      z-index: 10;
+      border-top: 1px solid rgba(120, 180, 255, 0.18);
+      background: rgba(6, 11, 28, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 32px 5% !important;
+      min-height: auto !important;
+      margin-bottom: 0 !important;
+      overflow: hidden;
+    }
+
+    .footer-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .footer-brand:hover {
+      opacity: 0.9;
+    }
+
+    .footer-logo-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 2px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 14px rgba(30, 111, 255, 0.5);
+    }
+
+    .footer-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .footer-brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.75);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: #38bdf8;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+    }
+
+    .footer-copy {
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       FULL-SCREEN PORTFOLIO VAULT MODAL (14 ITEMS)
+    ════════════════════════════════════════════════════════════════ */
+    .vault-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: rgba(5, 9, 22, 0.94);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .vault-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .vault-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(6, 11, 28, 0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(120, 180, 255, 0.2);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .vault-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .vault-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 3px;
+      box-shadow: 0 0 14px rgba(30, 111, 255, 0.5);
+    }
+
+    .vault-title-text h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .vault-title-text p {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .vault-filter-tabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(14, 22, 46, 0.7);
+      padding: 4px;
+      border-radius: 9999px;
+      border: 1px solid rgba(120, 180, 255, 0.2);
+    }
+
+    .vault-tab-btn {
+      padding: 7px 18px;
+      border-radius: 9999px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .vault-tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .vault-tab-btn.active {
+      color: #ffffff;
+      background: #1e6fff;
+      box-shadow: 0 0 18px rgba(30, 111, 255, 0.7);
+    }
+
+    .vault-close-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .vault-close-btn:hover {
+      background: #ff5722;
+      border-color: #ff8a65;
+      transform: rotate(90deg);
+    }
+
+    .vault-body {
+      padding: 34px 32px 70px;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .vault-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 24px;
+    }
+
+    .vault-card {
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(10, 16, 36, 0.8);
+      border: 1.5px solid rgba(120, 180, 255, 0.25);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .vault-card:hover {
+      transform: translateY(-5px);
+      border-color: #38bdf8;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(30, 111, 255, 0.5);
+    }
+
+    .vault-media-box {
+      width: 100%;
+      aspect-ratio: 10 / 14;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vault-media-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      cursor: zoom-in;
+      transition: transform 0.4s ease;
+    }
+
+    .vault-media-box:hover img {
+      transform: scale(1.05);
+    }
+
+    .vault-media-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .vault-card-info {
+      padding: 14px 18px;
+      background: rgba(6, 11, 24, 0.9);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .vault-card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .vault-card-tag {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      background: rgba(30, 111, 255, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .vault-card-tag.video {
+      background: rgba(255, 87, 34, 0.2);
+      color: #ff8a65;
+      border-color: rgba(255, 87, 34, 0.4);
+    }
+
+    /* LIGHTBOX ZOOM MODAL */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200000;
+      background: rgba(4, 7, 16, 0.92);
+      backdrop-filter: blur(28px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .lightbox-content-box {
+      position: relative;
+      max-width: 900px;
+      max-height: 88vh;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1.5px solid rgba(120, 180, 255, 0.4);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 50px rgba(30, 111, 255, 0.6);
+      background: #060a18;
+    }
+
+    .lightbox-content-box img {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 88vh;
+      display: block;
+      object-fit: contain;
+    }
+
+    .lightbox-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(10, 16, 36, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+
+    .lightbox-close-btn:hover {
+      background: #ff5722;
+      border-color: #ff8a65;
+      transform: scale(1.1);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       ZERO-GRAVITY FLOATING LEVITATION (CONTINUOUS SUBTLE FLOAT)
+       Strictly between 0px and -7px over 5s to 6.5s ease-in-out alternate
+    ════════════════════════════════════════════════════════════════ */
+    @keyframes subtleFloat {
+      0% {
+        transform: translateY(0px);
+        translate: 0 0px;
+      }
+      100% {
+        transform: translateY(-7px);
+        translate: 0 -7px;
+      }
+    }
+
+    @keyframes subtleFloat3D {
+      0% {
+        translate: 0 0px;
+      }
+      100% {
+        translate: 0 -7px;
+      }
+    }
+
+    /* Container Overflow Rule to prevent clipping badges & borders at peak of float */
+    .hero-grid,
+    .hero-right,
+    .hero-left,
+    .flagship-carousel-wrap,
+    .arc-stage-container,
+    .arc-cards-wrap,
+    .pricing-section,
+    .cards-row {
+      overflow: visible !important;
+    }
+
+    /* 1. Hero Cards Floating */
+    .folder-3d-wrap {
+      animation: subtleFloat 5.6s ease-in-out infinite alternate;
+      animation-delay: 0s;
+    }
+
+    .hero-preview-card {
+      animation: subtleFloat 6.0s ease-in-out infinite alternate;
+      animation-delay: 2.2s;
+    }
+
+    /* 2. Cinematic Flagship 3 Cards Levitation (Staggered Wave) */
+    .flagship-card.left-card {
+      animation: subtleFloat3D 5.4s ease-in-out infinite alternate;
+      animation-delay: 0s;
+    }
+
+    .flagship-card.center-main {
+      animation: subtleFloat 5.8s ease-in-out infinite alternate;
+      animation-delay: 1.8s;
+    }
+
+    .flagship-card.right-card {
+      animation: subtleFloat3D 6.2s ease-in-out infinite alternate;
+      animation-delay: 3.4s;
+    }
+
+    /* 3. UGC Essentials 3 Cards Levitation (Staggered Wave) */
+    .ugc-card.arc-left {
+      animation: subtleFloat3D 5.5s ease-in-out infinite alternate;
+      animation-delay: 0s;
+    }
+
+    .ugc-card.arc-center {
+      animation: subtleFloat3D 5.8s ease-in-out infinite alternate;
+      animation-delay: 1.8s;
+    }
+
+    .ugc-card.arc-right {
+      animation: subtleFloat3D 6.3s ease-in-out infinite alternate;
+      animation-delay: 3.4s;
+    }
+
+    /* 4. Pricing Table 3 Cards Levitation (Staggered Wave) */
+    .glass-card#card-starter {
+      animation: subtleFloat 5.4s ease-in-out infinite alternate;
+      animation-delay: 0s;
+    }
+
+    .glass-card#card-booster {
+      animation: subtleFloat 5.8s ease-in-out infinite alternate;
+      animation-delay: 1.8s;
+    }
+
+    .glass-card#card-scale {
+      animation: subtleFloat 6.2s ease-in-out infinite alternate;
+      animation-delay: 3.4s;
+    }
+
+    /* 100% Workable Hover & Active Video Pause (Crucial UX Rule) */
+    .folder-3d-wrap:hover,
+    .hero-preview-card:hover,
+    .flagship-card:hover,
+    .flagship-card.video-is-playing,
+    .ugc-card:hover,
+    .ugc-card.video-is-playing,
+    .glass-card:hover {
+      animation-play-state: paused !important;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       DEDICATED MOBILE STUDIO UI (max-width: 768px)
+       STRICT DESKTOP LOCK: Screens > 768px remain 100% untouched.
+    ════════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      /* Zero Horizontal Overflow Lock */
+      html, body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+      }
+
+      /* 1. Mobile Navbar: Compact glass pill bar with logo on left, drawer on right */
+      .nav-pill-wrapper {
+        padding: 10px 14px;
+        top: 10px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .pill-navbar {
+        padding: 8px 14px;
+        width: 100%;
+        max-width: 100%;
+        justify-content: space-between;
+      }
+      .pill-nav-links {
+        display: none !important;
+      }
+      .pill-brand {
+        gap: 8px;
+      }
+      .pill-brand-text {
+        font-size: 14px;
+        letter-spacing: 0.04em;
+      }
+      .pill-logo-circle {
+        width: 32px;
+        height: 32px;
+      }
+      .pill-drawer-btn {
+        padding: 7px 14px;
+        font-size: 13px;
+      }
+
+      /* 2. Mobile Hero Section: Clean Centered Single Column */
+      .hero-section {
+        padding: 24px 16px 48px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .hero-grid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 36px;
+        width: 100%;
+        text-align: center;
+      }
+      .hero-left {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        max-width: 100%;
+      }
+      .hero-category-tag {
+        margin: 0 auto 12px;
+        font-size: 12px;
+        padding: 5px 12px;
+      }
+      .hero-heading {
+        font-size: clamp(28px, 7.5vw, 36px);
+        line-height: 1.16;
+        text-align: center;
+        margin-bottom: 14px;
+      }
+      .hero-heading .explore-sub {
+        font-size: clamp(17px, 4.5vw, 22px);
+      }
+      .hero-description {
+        font-size: 14px;
+        line-height: 1.55;
+        text-align: center;
+        max-width: 95%;
+        margin: 0 auto 22px;
+      }
+      .btn-vault-trigger {
+        margin: 0 auto 34px;
+        width: auto;
+        padding: 12px 22px;
+        font-size: 13.5px;
+      }
+
+      /* ADORA LAB Vault folder centered cleanly */
+      .folder-3d-wrap {
+        width: 100%;
+        max-width: 330px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        perspective: none;
+      }
+      .adora-basket {
+        width: 100%;
+        max-width: 310px;
+        height: 250px;
+        margin: 0 auto;
+      }
+      .folder-tab {
+        top: -16px;
+        left: 20px;
+        padding: 5px 16px 3px;
+        font-size: 10px;
+      }
+      .fan-card-1 { transform: translateX(-65px) rotate(-12deg) translateY(6px); width: 88px; height: 124px; }
+      .fan-card-2 { transform: translateX(-22px) rotate(-4deg) translateY(-2px); width: 88px; height: 124px; }
+      .fan-card-3 { transform: translateX(22px) rotate(4deg) translateY(-2px); width: 88px; height: 124px; }
+      .fan-card-4 { transform: translateX(65px) rotate(12deg) translateY(6px); width: 88px; height: 124px; }
+      
+      .folder-front-flap {
+        padding: 16px;
+      }
+      .folder-front-brand {
+        bottom: 14px;
+        left: 14px;
+      }
+      .folder-front-logo-box {
+        width: 38px;
+        height: 38px;
+      }
+      .folder-front-brand-text {
+        font-size: 13.5px;
+      }
+      .folder-hint-tag {
+        font-size: 10px;
+      }
+      .folder-experience-badge,
+      .adora-basket .folder-experience-badge {
+        top: -14px;
+        right: 8px;
+        padding: 6px 12px;
+        font-size: 11px;
+        transform: rotate(6deg);
+        z-index: 15;
+      }
+      .badge-exp-number {
+        font-size: 13px;
+      }
+      .badge-exp-text {
+        font-size: 9px;
+      }
+
+      /* Poster Showcase card centered cleanly below with zero overlap */
+      .hero-right {
+        width: 100%;
+        max-width: 330px;
+        margin: 12px auto 0;
+        display: flex;
+        justify-content: center;
+      }
+      .hero-preview-card {
+        width: 100%;
+        max-width: 320px;
+        height: 460px;
+        margin: 0 auto;
+        border-radius: 22px;
+      }
+
+      /* 3. Mobile Video Showcases (Cinematic & UGC): Smooth Touch-Friendly Scroll-Snap Carousel */
+      .cinematic-flagship-section {
+        padding: 40px 0 45px;
+        width: 100%;
+        overflow-x: hidden;
+        box-sizing: border-box;
+      }
+      .cinematic-header,
+      .ugc-header,
+      .pricing-header,
+      .why-us-header,
+      .faq-header {
+        padding: 0 16px;
+        margin-bottom: 24px;
+      }
+      .section-title {
+        font-size: clamp(24px, 6.5vw, 32px);
+      }
+      .section-desc {
+        font-size: 14px;
+        padding: 0 8px;
+      }
+
+      .flagship-carousel-wrap {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 16px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 16px 20px 28px;
+        width: 100%;
+        box-sizing: border-box;
+        scrollbar-width: none;
+        perspective: none;
+      }
+      .flagship-carousel-wrap::-webkit-scrollbar {
+        display: none;
+      }
+      .flagship-card {
+        scroll-snap-align: center;
+        flex: 0 0 82vw;
+        max-width: 310px;
+        height: 500px;
+        transform: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+        border-radius: 22px;
+      }
+      .flagship-card.side-card,
+      .flagship-card.center-main {
+        width: 82vw;
+        max-width: 310px;
+        height: 500px;
+        transform: none !important;
+        opacity: 1 !important;
+        filter: none !important;
+      }
+
+      /* UGC Essentials Showcase Mobile Carousel */
+      .ugc-section {
+        padding: 40px 0 50px;
+        width: 100%;
+        overflow-x: hidden;
+        box-sizing: border-box;
+      }
+      .arc-stage-container {
+        height: auto;
+        min-height: auto;
+        padding: 0;
+        position: relative;
+        overflow-x: hidden;
+      }
+      .arc-cards-wrap {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 16px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 16px 20px 24px;
+        width: 100%;
+        height: auto;
+        box-sizing: border-box;
+        scrollbar-width: none;
+      }
+      .arc-cards-wrap::-webkit-scrollbar {
+        display: none;
+      }
+      .ugc-card {
+        position: relative !important;
+        scroll-snap-align: center;
+        flex: 0 0 82vw;
+        max-width: 310px;
+        height: 500px !important;
+        transform: none !important;
+        opacity: 1 !important;
+        border-radius: 22px;
+        inset: auto !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+      }
+      .ugc-card.arc-left,
+      .ugc-card.arc-center,
+      .ugc-card.arc-right {
+        width: 82vw !important;
+        max-width: 310px !important;
+        height: 500px !important;
+        transform: none !important;
+        opacity: 1 !important;
+      }
+      .arc-bottom-center-badge {
+        position: relative;
+        margin: 16px auto 0;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        display: inline-flex;
+        font-size: 11.5px;
+        padding: 8px 16px;
+      }
+
+      /* 4. Mobile Pricing Section: Clean Single-Column Stack */
+      .pricing-section {
+        padding: 40px 16px 50px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .cards-row {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        max-width: 420px;
+        margin: 24px auto 0;
+        overflow: visible !important;
+      }
+      .glass-card {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        box-sizing: border-box;
+        border-radius: 22px;
+        padding: 28px 22px;
+      }
+      .card-name {
+        font-size: 20px;
+      }
+      .price-val {
+        font-size: 44px;
+      }
+      .btn-select-tier {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 0;
+      }
+      .trust-pill-banner {
+        font-size: 12px;
+        padding: 10px 16px;
+        margin: 28px auto 0;
+        max-width: 94%;
+        text-align: center;
+      }
+
+      /* 5. Mobile 'Why Partner With Adora Lab': 4 Single-Column Cards */
+      .why-us-section {
+        padding: 40px 16px 50px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .why-us-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 420px;
+        margin: 24px auto 0;
+      }
+      .why-card {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 22px 20px;
+        border-radius: 18px;
+      }
+      .why-card-title {
+        font-size: 17px;
+      }
+      .why-card-text {
+        font-size: 13.5px;
+      }
+
+      /* 6. Mobile FAQ Accordions: Clean Single-Column Stack */
+      .faq-section {
+        padding: 40px 16px 55px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .faq-container {
+        width: 100%;
+        max-width: 440px;
+        margin: 24px auto 0;
+      }
+      .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .faq-item {
+        border-radius: 14px;
+      }
+      .faq-question-btn {
+        padding: 16px 18px;
+        font-size: 14.5px;
+        width: 100%;
+      }
+      .faq-answer-wrap {
+        padding: 0 18px;
+      }
+      .faq-item.active .faq-answer-wrap {
+        padding: 0 18px 18px 18px;
+      }
+      .faq-answer-text {
+        font-size: 13.5px;
+        line-height: 1.55;
+      }
+
+      /* 7. Mobile Contact Section & Twin Cards */
+      .contact-section {
+        padding: 40px 16px 60px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        width: 100%;
+        max-width: 440px;
+        margin: 0 auto;
+      }
+      .contact-left-card,
+      .contact-right-card {
+        padding: 24px 20px;
+        border-radius: 20px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .btn-send-message {
+        width: 100%;
+        padding: 14px 0;
+      }
+
+      /* 8. Mobile Footer */
+      .site-footer {
+        padding: 28px 16px !important;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px 18px;
+      }
+      .footer-copyright {
+        font-size: 12px;
+        text-align: center;
+      }
+
+      /* Vault Drawer Mobile Optimization */
+      .vault-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .vault-filter-pills {
+        overflow-x: auto;
+        width: 100%;
+        padding-bottom: 6px;
+      }
+      .vault-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FIXED CANVAS BACKGROUND ANIMATION -->
+  <div id="canvas-container">
+    <canvas id="canvas"></canvas>
+    <div class="canvas-vignette"></div>
+  </div>
+
+  <!-- CLEAN FULL-SCREEN FIXED STUDIO OVERLAY TINT (85% TRANSPARENT DARK TINT) -->
+  <div class="bg-dark-overlay" style="position: fixed; inset: 0; pointer-events: none; z-index: 0; background: rgba(0, 0, 0, 0.15);"></div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       1. TOP PILL NAVBAR
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="nav-pill-wrapper">
+    <header class="pill-navbar">
+      <!-- Left: Logo Circle + ADORA LAB (Click scrolls smoothly to top) -->
+      <a href="#portfolio" class="pill-brand" onclick="event.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); history.replaceState(null, '', '#portfolio');" title="Adora Lab — Scroll to Top">
+        <div class="pill-logo-circle">
+          <img src="/images/adora-lab-logo.jpg" alt="Adora Lab Logo" class="pill-logo-img" />
+        </div>
+        <span class="pill-brand-text">ADORA LAB</span>
+      </a>
+
+      <!-- Center: Navigation Links -->
+      <nav>
+        <ul class="pill-nav-links">
+          <li><a href="#portfolio" class="nav-pill-item active-pill">Portfolio</a></li>
+          <li><a href="#showcase" class="nav-pill-item">Services</a></li>
+          <li><a href="#pricing" class="nav-pill-item">Pricing</a></li>
+          <li><a href="#why-us" class="nav-pill-item">Why Us</a></li>
+          <li><a href="#faq" class="nav-pill-item">FAQ</a></li>
+          <li><a href="#contact" class="nav-pill-item">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Right: Menu Icon Button (Opens Studio Drawer) -->
+      <button class="pill-menu-btn" aria-label="Toggle Studio Drawer" onclick="openDrawer()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </header>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       GLASSMORPHIC STUDIO DRAWER (RIGHT-SIDE SLIDE-IN)
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+  <aside class="studio-drawer" id="studioDrawer" aria-label="Studio Navigation Drawer">
+    
+    <!-- Drawer Header -->
+    <div class="drawer-header">
+      <div class="drawer-brand">
+        <div class="pill-logo-circle" style="width: 34px; height: 34px;">
+          <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" class="pill-logo-img" />
+        </div>
+        <span class="pill-brand-text" style="font-size: 15px;">ADORA LAB</span>
+      </div>
+      <button class="drawer-close-btn" id="drawerCloseBtn" onclick="closeDrawer()" aria-label="Close Drawer">&times;</button>
+    </div>
+
+    <!-- Founder Card (Clean Text-Only Layout — No Photo) -->
+    <div class="drawer-glass-card">
+      <div class="drawer-card-label">FOUNDER &amp; CREATIVE DIRECTOR</div>
+      <div class="founder-name">Rohit Mahato</div>
+      <p class="founder-subtext">Crafting photorealistic AI commercials and high-converting UGC ads for modern global brands.</p>
+    </div>
+
+    <!-- Studio Workflow & Turnaround Card -->
+    <div class="drawer-glass-card">
+      <div class="drawer-card-label">HOW WE WORK</div>
+      <div class="workflow-title">Studio Production Workflow</div>
+      <div class="workflow-steps">
+        <div class="workflow-step">
+          <span class="step-num">01</span>
+          <span class="step-text">Share Your Product &amp; Brief</span>
+        </div>
+        <div class="workflow-step">
+          <span class="step-num">02</span>
+          <span class="step-text">100% Character &amp; Product Consistency Lock</span>
+        </div>
+        <div class="workflow-step">
+          <span class="step-num">03</span>
+          <span class="step-text">Studio-Grade Audio, ASMR &amp; Final Polish</span>
+        </div>
+      </div>
+      <div class="delivery-time-pill">
+        <span>⚡ Average Delivery: 3–4 Days</span>
+        <span class="delivery-sub">🌐 Global Digital Delivery • Easy Online Workflows</span>
+      </div>
+    </div>
+
+    <!-- Quick Jump Links & CTA -->
+    <div class="drawer-nav-section">
+      <div class="drawer-card-label">QUICK NAVIGATION</div>
+      <ul class="drawer-nav-list">
+        <li><a href="#portfolio" onclick="closeDrawer()" class="drawer-nav-link"><span>Portfolio Showcase</span> <span>&#8599;</span></a></li>
+        <li><a href="#showcase" onclick="closeDrawer()" class="drawer-nav-link"><span>Cinematic Commercials</span> <span>&#8599;</span></a></li>
+        <li><a href="#ugc-arc" onclick="closeDrawer()" class="drawer-nav-link"><span>UGC Essentials</span> <span>&#8599;</span></a></li>
+        <li><a href="#pricing" onclick="closeDrawer()" class="drawer-nav-link"><span>Pricing Plans</span> <span>&#8599;</span></a></li>
+        <li><a href="#why-us" onclick="closeDrawer()" class="drawer-nav-link"><span>Why Adora Lab</span> <span>&#8599;</span></a></li>
+        <li><a href="#faq" onclick="closeDrawer()" class="drawer-nav-link"><span>FAQ</span> <span>&#8599;</span></a></li>
+        <li><a href="#contact" onclick="closeDrawer()" class="drawer-nav-link"><span>Get in Touch</span> <span>&#8599;</span></a></li>
+      </ul>
+
+      <!-- 'Start Your Project ->' Button -->
+      <button type="button" class="drawer-cta-btn" onclick="triggerDrawerProject()">
+        <span>Start Your Project</span>
+        <span>&#8594;</span>
+      </button>
+    </div>
+
+    <!-- Official Social Connection -->
+    <a href="https://www.instagram.com/hello.adoralab" target="_blank" rel="noopener noreferrer" class="drawer-social-pill">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #38bdf8;">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span>@hello.adoralab</span>
+      </div>
+      <span style="color:#38bdf8;">&#8599;</span>
+    </a>
+
+  </aside>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       PAGE CONTENT
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="page">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         2. HERO & FROSTED GLASS BASKET / FOLDER (100% WORKABLE ALL-MEDIA VAULT)
+    ════════════════════════════════════════════════════════════════ -->
+    <section class="hero-section" id="portfolio">
+      <span id="hero" style="position:absolute; top:0; left:0; width:0; height:0; pointer-events:none;"></span>
+      <div class="hero-grid">
+
+        <!-- Left Column: Heading + 3D Frosted Glass Basket -->
+        <div class="hero-left">
+          
+          <h1 class="hero-heading">
+            <span class="explore-sub">Explore Our</span>
+            <span class="highlight-ai">AI Commercial &amp; UGC</span>
+            <span class="portfolio-row">
+              Portfolio
+              <!-- Glowing Electric Blue (#1E6FFF) Star Rosette Badge -->
+              <span class="electric-star-badge" title="100% Brand Consistency Verified">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <span class="badge-ribbons">
+                  <span class="badge-ribbon-tail"></span>
+                  <span class="badge-ribbon-tail"></span>
+                </span>
+              </span>
+            </span>
+          </h1>
+
+          <p class="hero-desc">
+            Next-generation commercial visual storytelling. We combine photorealistic AI character consistency, studio-grade commercial direction, and high-converting UGC formats to scale modern brands.
+          </p>
+
+          <!-- 'Review' Button (Opens Full-Screen Media Vault Grid) -->
+          <div class="hero-btn-row">
+            <button type="button" class="pill-action-btn" onclick="openVaultModal()">
+              <span>Review Portfolio Vault</span>
+              <span class="arrow-icon-circle">&#8599;</span>
+            </button>
+          </div>
+
+          <!-- 3D TRANSLUCENT FROSTED-GLASS BASKET / FOLDER (ALL-MEDIA VAULT) -->
+          <div class="folder-3d-wrap adora-basket" onclick="openVaultModal()" title="Click to open Full-Screen Portfolio Vault">
+            <div class="folder-stage">
+              <!-- Back Wall -->
+              <div class="folder-back-wall"></div>
+
+              <!-- 4 REAL POSTER THUMBNAILS FANNING OUT -->
+              <div class="folder-fan-posters">
+                <!-- Poster 1 -->
+                <div class="fan-poster-card fan-card-1">
+                  <img 
+                    src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306" 
+                    alt="AI Commercial Creative 1" 
+                    loading="lazy" 
+                    style="width:100%; height:100%; object-fit:cover;"
+                  />
+                </div>
+                <!-- Poster 2 -->
+                <div class="fan-poster-card fan-card-2">
+                  <img 
+                    src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png" 
+                    alt="Adora Lab Men's Day Poster" 
+                    loading="lazy" 
+                    style="width:100%; height:100%; object-fit:cover;"
+                  />
+                </div>
+                <!-- Poster 3 -->
+                <div class="fan-poster-card fan-card-3">
+                  <img 
+                    src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg" 
+                    alt="Cake O' Clock Creative" 
+                    loading="lazy" 
+                    style="width:100%; height:100%; object-fit:cover;"
+                  />
+                </div>
+                <!-- Poster 4 -->
+                <div class="fan-poster-card fan-card-4">
+                  <img 
+                    src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png" 
+                    alt="Cake O' Cloke Luxury 01" 
+                    loading="lazy" 
+                    style="width:100%; height:100%; object-fit:cover;"
+                  />
+                </div>
+              </div>
+
+              <!-- Front Frosted Glass Flap -->
+              <div class="folder-front-flap">
+                <div class="folder-front-brand">
+                  <div class="folder-front-logo-box">
+                    <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" />
+                  </div>
+                  <span class="folder-front-brand-text">ADORA LAB</span>
+                  <span class="folder-hint-tag">Tap to Open Vault (14 Creatives)</span>
+                </div>
+
+                <!-- Glowing Electric Blue (#1E6FFF) '100% Brand Consistency' Tag -->
+                <div class="folder-experience-badge">
+                  <span class="badge-exp-number">100%</span>
+                  <span class="badge-exp-text">Brand Consistency</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: 100% Workable Auto-Sliding & Swipeable Poster Carousel (All 8 Posters) -->
+        <div class="hero-right">
+          <div class="hero-preview-card" id="previewCardContainer">
+            <!-- Click-to-Zoom Expand Button -->
+            <button class="preview-expand-btn" aria-label="Open Full Lightbox" onclick="openLightbox(currentSlideIndex)">
+              &#8599;
+            </button>
+
+            <!-- Previous / Next Arrow Controls -->
+            <button class="carousel-nav-btn prev-btn" onclick="prevSlide(event)" aria-label="Previous Poster">&#10094;</button>
+            <button class="carousel-nav-btn next-btn" onclick="nextSlide(event)" aria-label="Next Poster">&#10095;</button>
+
+            <!-- 8 Slide Images -->
+            <div class="hero-preview-slider" id="previewSlider">
+              <div class="preview-slide active" data-index="0" onclick="openLightbox(0)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306" 
+                  alt="Brand Poster 1" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+              <div class="preview-slide" data-index="1" onclick="openLightbox(1)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png" 
+                  alt="Brand Poster 2" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+              <div class="preview-slide" data-index="2" onclick="openLightbox(2)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp" 
+                  alt="Brand Poster 3" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+              <div class="preview-slide" data-index="3" onclick="openLightbox(3)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png" 
+                  alt="Brand Poster 4" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+              <div class="preview-slide" data-index="4" onclick="openLightbox(4)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png" 
+                  alt="Brand Poster 5 — Men's Day" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+              <div class="preview-slide" data-index="5" onclick="openLightbox(5)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg" 
+                  alt="Brand Poster 6 — Cake O' Clock" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+              <div class="preview-slide" data-index="6" onclick="openLightbox(6)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png" 
+                  alt="Brand Poster 7" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+              <div class="preview-slide" data-index="7" onclick="openLightbox(7)">
+                <img 
+                  src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png" 
+                  alt="Brand Poster 8 — Cake O' Cloke Luxury" 
+                  loading="lazy" 
+                  style="width:100%; height:100%; object-fit:cover;" 
+                />
+              </div>
+            </div>
+
+            <!-- Footer: Bottom Label + Clickable Pagination Dots -->
+            <div class="preview-card-footer">
+              <span class="preview-meta-title" id="previewMetaTitle">Brand Poster Showcase — Commercial Ad Creatives</span>
+              <div class="preview-meta-dots" id="previewDots">
+                <span class="preview-dot active" onclick="setSlide(0)"></span>
+                <span class="preview-dot" onclick="setSlide(1)"></span>
+                <span class="preview-dot" onclick="setSlide(2)"></span>
+                <span class="preview-dot" onclick="setSlide(3)"></span>
+                <span class="preview-dot" onclick="setSlide(4)"></span>
+                <span class="preview-dot" onclick="setSlide(5)"></span>
+                <span class="preview-dot" onclick="setSlide(6)"></span>
+                <span class="preview-dot" onclick="setSlide(7)"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    
+
+    <!-- ════════════════════════════════════════════════════════════════
+         3. MIDDLE 3-CARD FOCUS CAROUSEL (CINEMATIC FLAGSHIP SHOWCASE)
+    ════════════════════════════════════════════════════════════════ -->
+    <section class="showcase-section" id="showcase">
+      <div class="section-header-center">
+        <span class="section-tag">CINEMATIC FLAGSHIP SHOWCASE</span>
+        <h2 class="section-title">Cinematic Brand Storytelling That Converts</h2>
+        <p class="section-desc">Crafted with precision product accuracy, dynamic camera movement, and immersive sound design built to turn viewers into buyers.</p>
+      </div>
+
+      <!-- 3-Card Carousel: 1 Center Main + 2 Faded Side Cards -->
+      <div class="flagship-carousel-wrap">
+
+        <!-- Left Side Card (Cloudinary .mp4) -->
+        <div class="flagship-card side-card left-card" title="Click to play with sound">
+          <div class="video-frame-box">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075207/lv_0_20261031195109.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Main Card (Cloudinary .mp4) -->
+        <div class="flagship-card center-main" id="centerFlagshipCard" title="Click to play with sound">
+          <div class="video-frame-box" id="centerVideoFrameBox">
+            <video 
+              id="centerMainVideo"
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075208/lv_0_20261031190549.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side Card (Cloudinary .mp4) -->
+        <div class="flagship-card side-card right-card" title="Click to play with sound">
+          <div class="video-frame-box">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794076053/handmade_gift.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="showcase-footer-actions">
+        <button type="button" class="view-all-pill-btn" onclick="openVaultModal('cinematic')">View All</button>
+        <a href="#ugc-arc" class="down-nav-arrow-btn" aria-label="Scroll to UGC Showcase">&#8964;</a>
+      </div>
+    </section>
+
+    
+
+    <!-- ════════════════════════════════════════════════════════════════
+         4. BOTTOM SEMI-CIRCULAR ARC SECTION (UGC ESSENTIALS SHOWCASE)
+    ════════════════════════════════════════════════════════════════ -->
+    <section class="ugc-arc-section" id="ugc-arc">
+      <div class="section-header-center">
+        <span class="section-tag">UGC ESSENTIALS SHOWCASE</span>
+        <h2 class="section-title">High-Converting AI Creator Videos</h2>
+        <p class="section-desc">Authentic social ads engineered for TikTok, Instagram Reels, and YouTube Shorts that convert attention into sales.</p>
+      </div>
+
+      <div class="arc-stage-container">
+
+        <!-- Glowing Semicircular SVG Track -->
+        <svg class="arc-svg-bg" viewBox="0 0 1000 600" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="arcNeonGrad" x1="0%" y1="100%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.2" />
+              <stop offset="25%" stop-color="#1e6fff" stop-opacity="0.95" />
+              <stop offset="50%" stop-color="#60a5fa" stop-opacity="1" />
+              <stop offset="75%" stop-color="#1e6fff" stop-opacity="0.95" />
+              <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.2" />
+            </linearGradient>
+          </defs>
+          <path d="M 60 520 A 440 380 0 0 1 940 520" class="arc-neon-path" stroke="url(#arcNeonGrad)"></path>
+          <path d="M 120 520 A 380 320 0 0 1 880 520" class="arc-inner-path"></path>
+        </svg>
+
+        <div class="arc-radial-glow"></div>
+
+        <!-- 3 UGC Essentials Videos Placed on the Arc -->
+        <div class="arc-cards-wrap">
+
+          <!-- Left Angled Card (Cloudinary .mp4) -->
+          <div class="ugc-card arc-left" title="Click to play with sound">
+            <div class="video-frame-box">
+              <video 
+                src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075200/lv_0_20261029140825.mp4" 
+                playsinline 
+                preload="metadata" 
+                loop 
+                style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+                class="adora-html5-video">
+              </video>
+              <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+                <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+                <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+                <span class="ctrl-label">Play Sound</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center Upright Card (Cloudinary .mp4) -->
+          <div class="ugc-card arc-center" title="Click to play with sound">
+            <div class="video-frame-box">
+              <video 
+                src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075192/lv_0_20261101191608.mp4" 
+                playsinline 
+                preload="metadata" 
+                loop 
+                style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+                class="adora-html5-video">
+              </video>
+              <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+                <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+                <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+                <span class="ctrl-label">Play Sound</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Angled Card (Cloudinary .mp4) -->
+          <div class="ugc-card arc-right" title="Click to play with sound">
+            <div class="video-frame-box">
+              <video 
+                src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075707/shirt_ad.mp4" 
+                playsinline 
+                preload="metadata" 
+                loop 
+                style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+                class="adora-html5-video">
+              </video>
+              <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+                <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+                <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+                <span class="ctrl-label">Play Sound</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Circular Adora Lab Icon Badge at Bottom Center -->
+        <div class="arc-bottom-center-badge" onclick="openVaultModal('ugc')" title="Open UGC Creator Vault">
+          <img src="/images/adora-lab-logo.jpg" alt="Adora Lab Badge" class="badge-logo-img" />
+        </div>
+
+      </div>
+    </section>
+
+    
+
+    <!-- ════════════════════════════════════════════════════════════════
+         5. PRICING SECTION WITH INTERACTIVE SUB-TIERS
+    ════════════════════════════════════════════════════════════════ -->
+    <section class="pricing-section" id="pricing">
+
+      <!-- Clean Stacked Pricing Header -->
+      <div class="pricing-header">
+        <span class="pricing-label">PRICING</span>
+        <h1>Choose Your Plan</h1>
+        <p>Select your track and package below — both tiers inside each card are directly clickable with live pricing.</p>
+      </div>
+
+      <!-- CARDS IN ONE ROW (Left: Adora Starter, Middle: Most Popular, Right: Best Value) -->
+      <div class="cards-row">
+
+        <!-- ═══ 1. LEFT: Adora Family Starter (Electric Blue Accent) ═══ -->
+        <div class="glass-card starter" id="card-starter">
+          <h2 class="card-plan-name">Adora Family Starter</h2>
+          <p class="card-plan-desc">A taste of Adora for the inner circle.</p>
+
+          <!-- Sub-Tier 1: UGC Essentials ($99) - Default Active -->
+          <div class="sub-plan active-tier" 
+               onclick="selectSubTier('starter', 'UGC Essentials', '$99', '2 AI Photos + 2 UGC Videos')"
+               data-tier="ugc">
+            <div class="sub-plan-header-row">
+              <div class="sub-plan-label">UGC Essentials</div>
+              <div class="tier-radio-indicator"></div>
+            </div>
+            <div class="sub-plan-price">
+              <span class="price-amount">$99</span>
+              <span class="price-unit">per pack</span>
+            </div>
+            <ul class="features">
+              <li>
+                <svg class="check-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                2 AI product photos
+              </li>
+              <li>
+                <svg class="check-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                2 UGC-style videos
+              </li>
+              <li>
+                <svg class="check-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Direct social ad + dialogue
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sub-Tier 2: Cinematic Suite ($149) -->
+          <div class="sub-plan" 
+               onclick="selectSubTier('starter', 'Cinematic Suite', '$149', '2 AI Photos + 2 Cinematic Videos')"
+               data-tier="cinematic">
+            <div class="sub-plan-header-row">
+              <div class="sub-plan-label">Cinematic Suite</div>
+              <div class="tier-radio-indicator"></div>
+            </div>
+            <div class="sub-plan-price">
+              <span class="price-amount">$149</span>
+              <span class="price-unit">per pack</span>
+            </div>
+            <ul class="features">
+              <li>
+                <svg class="check-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                2 AI product photos
+              </li>
+              <li>
+                <svg class="check-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                2 cinematic videos
+              </li>
+              <li>
+                <svg class="check-icon blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                TV-grade story ad
+              </li>
+            </ul>
+          </div>
+
+          <!-- Includes & Live CTA Button -->
+          <div class="includes-section">
+            <div class="includes-label">Every plan includes</div>
+            <ul class="includes-list">
+              <li><span class="inc-dot blue"></span>Character &amp; product consistency</li>
+              <li><span class="inc-dot blue"></span>Music + SFX</li>
+              <li><span class="inc-dot blue"></span>2 Revisions (UGC) / 4 Revisions (Cinematic)</li>
+            </ul>
+            <button type="button" class="cta-btn solid-blue" id="btn-starter" onclick="triggerGetStarted('starter')">
+              Get Started — $99
+            </button>
+          </div>
+        </div>
+
+        <!-- ═══ 2. MIDDLE: Monthly Brand Booster (Vibrant Orange Accent) ═══ -->
+        <div class="glass-card popular" id="card-booster">
+          <span class="badge badge-popular">Most Popular</span>
+          <h2 class="card-plan-name">Monthly Brand Booster</h2>
+          <p class="card-plan-desc">Fresh, on-trend content every single month.</p>
+
+          <!-- Sub-Tier 1: UGC Essentials ($149) -->
+          <div class="sub-plan" 
+               onclick="selectSubTier('booster', 'UGC Essentials', '$149', '4 AI Photos + 4 UGC Videos')"
+               data-tier="ugc">
+            <div class="sub-plan-header-row">
+              <div class="sub-plan-label">UGC Essentials</div>
+              <div class="tier-radio-indicator"></div>
+            </div>
+            <div class="sub-plan-price">
+              <span class="price-amount">$149</span>
+              <span class="price-unit">per pack</span>
+            </div>
+            <ul class="features">
+              <li>
+                <svg class="check-icon orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                4 AI product photos
+              </li>
+              <li>
+                <svg class="check-icon orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                4 UGC-style videos
+              </li>
+              <li>
+                <svg class="check-icon orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                High-converting UGC pack
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sub-Tier 2: Cinematic Suite ($199) - Default Active -->
+          <div class="sub-plan active-tier" 
+               onclick="selectSubTier('booster', 'Cinematic Suite', '$199', '4 AI Photos + 4 Cinematic Videos')"
+               data-tier="cinematic">
+            <div class="sub-plan-header-row">
+              <div class="sub-plan-label">Cinematic Suite</div>
+              <div class="tier-radio-indicator"></div>
+            </div>
+            <div class="sub-plan-price">
+              <span class="price-amount">$199</span>
+              <span class="price-unit">per pack</span>
+            </div>
+            <ul class="features">
+              <li>
+                <svg class="check-icon orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                4 AI product photos
+              </li>
+              <li>
+                <svg class="check-icon orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                4 cinematic videos
+              </li>
+              <li>
+                <svg class="check-icon orange" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Story ads + smart web tool idea
+              </li>
+            </ul>
+          </div>
+
+          <!-- Includes & Live CTA Button -->
+          <div class="includes-section">
+            <div class="includes-label">Every plan includes</div>
+            <ul class="includes-list">
+              <li><span class="inc-dot orange"></span>Character &amp; product consistency</li>
+              <li><span class="inc-dot orange"></span>Music + SFX</li>
+              <li><span class="inc-dot orange"></span>2 Revisions (UGC) / 4 Revisions (Cinematic)</li>
+            </ul>
+            <button type="button" class="cta-btn solid-orange" id="btn-booster" onclick="triggerGetStarted('booster')">
+              Get Started — $199
+            </button>
+          </div>
+        </div>
+
+        <!-- ═══ 3. RIGHT: Brand Scale Domination (Cyan Accent) ═══ -->
+        <div class="glass-card best-value" id="card-scale">
+          <span class="badge badge-value">Best Value</span>
+          <h2 class="card-plan-name">Brand Scale Domination</h2>
+          <p class="card-plan-desc">Maximum output for brands ready to scale.</p>
+
+          <!-- Sub-Tier 1: UGC Essentials ($199) -->
+          <div class="sub-plan" 
+               onclick="selectSubTier('scale', 'UGC Essentials', '$199', '8 AI Photos + 8 UGC Videos')"
+               data-tier="ugc">
+            <div class="sub-plan-header-row">
+              <div class="sub-plan-label">UGC Essentials</div>
+              <div class="tier-radio-indicator"></div>
+            </div>
+            <div class="sub-plan-price">
+              <span class="price-amount">$199</span>
+              <span class="price-unit">per pack</span>
+            </div>
+            <ul class="features">
+              <li>
+                <svg class="check-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                8 AI product photos
+              </li>
+              <li>
+                <svg class="check-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                8 UGC-style videos
+              </li>
+              <li>
+                <svg class="check-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Best value for small brands
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sub-Tier 2: Cinematic Flagship ($299) - Default Active -->
+          <div class="sub-plan active-tier" 
+               onclick="selectSubTier('scale', 'Cinematic Flagship', '$299', '8 AI Photos + 8 Cinematic Videos')"
+               data-tier="cinematic">
+            <div class="sub-plan-header-row">
+              <div class="sub-plan-label">Cinematic Flagship</div>
+              <div class="tier-radio-indicator"></div>
+            </div>
+            <div class="sub-plan-price">
+              <span class="price-amount">$299</span>
+              <span class="price-unit">per pack</span>
+            </div>
+            <ul class="features">
+              <li>
+                <svg class="check-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                8 AI product photos
+              </li>
+              <li>
+                <svg class="check-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                8 cinematic videos
+              </li>
+              <li>
+                <svg class="check-icon cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Custom web tool + biz growth ideas
+              </li>
+            </ul>
+          </div>
+
+          <!-- Includes & Live CTA Button -->
+          <div class="includes-section">
+            <div class="includes-label">Every plan includes</div>
+            <ul class="includes-list">
+              <li><span class="inc-dot cyan"></span>Character &amp; product consistency</li>
+              <li><span class="inc-dot cyan"></span>Music + SFX</li>
+              <li><span class="inc-dot cyan"></span>2 Revisions (UGC) / 4 Revisions (Cinematic)</li>
+            </ul>
+            <button type="button" class="cta-btn solid-cyan" id="btn-scale" onclick="triggerGetStarted('scale')">
+              Get Started — $299
+            </button>
+          </div>
+        </div>
+
+      </div><!-- .cards-row -->
+
+      <!-- Trust Pill Banner -->
+      <div class="trust-pill-banner">
+        <span class="trust-pill-icon"></span>
+        <span>Every Adora Lab plan includes 100% Character &amp; Product Consistency, English Voiceovers, and Studio ASMR/SFX.</span>
+      </div>
+
+    </section>
+
+    
+
+    
+    <!-- ════════════════════════════════════════════════════════════════
+         5B. WHY PARTNER WITH ADORA LAB (#why-us)
+         CRITICAL: 100% transparent wrapper for scroll background
+    ════════════════════════════════════════════════════════════════ -->
+    <section class="why-us-section" id="why-us">
+      <div class="section-header-center">
+        <span class="section-tag">• WHY ADORA LAB</span>
+        <h2 class="section-title">Built for Global Brands That Value Precision</h2>
+        <p class="section-desc">Eliminating studio friction, physical shipping, and AI hallucinations with 100% character and product consistency.</p>
+      </div>
+
+      <div class="why-us-grid">
+        <!-- Card 1 — Zero Shipping Hassle — Fully Digital Workflow -->
+        <div class="why-card">
+          <div class="why-card-icon-wrap">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <h3 class="why-card-title">Zero Shipping Hassle — Fully Digital Workflow</h3>
+          <p class="why-card-desc">Receive 4K Commercials &amp; Visuals Digitally anywhere with zero studio fees. Send us clean photos of your product, and we deliver studio-grade visuals digitally in 3–4 days.</p>
+        </div>
+
+        <!-- Card 2 — 100% Label & Character Lock -->
+        <div class="why-card">
+          <div class="why-card-icon-wrap">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 class="why-card-title">100% Label &amp; Character Lock</h3>
+          <p class="why-card-desc">No distorted logos or shifting faces. Your exact packaging text, bottle shape, and model identity stay consistent across every frame.</p>
+        </div>
+
+        <!-- Card 3 — Retention-Driven Storytelling -->
+        <div class="why-card">
+          <div class="why-card-icon-wrap">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </div>
+          <h3 class="why-card-title">Retention-Driven Storytelling</h3>
+          <p class="why-card-desc">Every ad combines scroll-stopping hooks, natural English voiceovers, and crisp studio ASMR/SFX engineered to hold viewer attention.</p>
+        </div>
+
+        <!-- Card 4 — Content + Smart Web Tool Edge -->
+        <div class="why-card">
+          <div class="why-card-icon-wrap">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+              <line x1="14" y1="4" x2="10" y2="20"></line>
+            </svg>
+          </div>
+          <h3 class="why-card-title">Content + Smart Web Tool Edge</h3>
+          <p class="why-card-desc">Our Cinematic tiers go beyond video by equipping your store with custom smart web tools and actionable growth ideas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         5C. FREQUENTLY ASKED QUESTIONS (#faq)
+         CRITICAL: 100% transparent wrapper for scroll background
+    ════════════════════════════════════════════════════════════════ -->
+    <section class="faq-section" id="faq">
+      <div class="section-header-center">
+        <span class="section-tag">• FAQ</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-desc">Everything you need to know about our production pipeline, deliverables, and commercial rights.</p>
+      </div>
+
+      <div class="faq-container">
+        <!-- FAQ 1 (Open by default) -->
+        <div class="faq-item active" id="faq-item-1">
+          <button type="button" class="faq-question-btn" onclick="toggleFaq(1)" aria-expanded="true">
+            <span>Do I need to ship my physical product, and will my label stay accurate?</span>
+            <span class="faq-toggle-icon" id="faq-icon-1">&minus;</span>
+          </button>
+          <div class="faq-answer-wrap">
+            <p class="faq-answer-text">Zero Shipping Hassle — Fully Digital Workflow. Simply share clean photos of your product from a few angles, and receive 4K Commercials &amp; Visuals Digitally anywhere. Our workflow locks in 100% Product &amp; Character Consistency, ensuring your exact brand logo, label typography, and packaging stay sharp and distortion-free.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="faq-item" id="faq-item-2">
+          <button type="button" class="faq-question-btn" onclick="toggleFaq(2)" aria-expanded="false">
+            <span>How many revisions are included in each plan?</span>
+            <span class="faq-toggle-icon" id="faq-icon-2">&#43;</span>
+          </button>
+          <div class="faq-answer-wrap">
+            <p class="faq-answer-text">Every UGC Essentials (Basic) plan includes 2 free revision rounds, while our Cinematic Suite &amp; Flagship (Premium) plans include 4 free revision rounds to fine-tune pacing, dialogue, audio mix, or visual polish. Average initial delivery takes 3–4 days depending on your chosen plan.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="faq-item" id="faq-item-3">
+          <button type="button" class="faq-question-btn" onclick="toggleFaq(3)" aria-expanded="false">
+            <span>What video formats and aspect ratios do you deliver?</span>
+            <span class="faq-toggle-icon" id="faq-icon-3">&#43;</span>
+          </button>
+          <div class="faq-answer-wrap">
+            <p class="faq-answer-text">Both formats are available at no extra cost. Whether you need 9:16 Vertical (for Instagram Reels, TikTok, and YouTube Shorts) or 16:9 Horizontal / Widescreen (for website heroes, YouTube ads, and TV-style commercials), we deliver ready-to-launch 4K files.</p>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="faq-item" id="faq-item-4">
+          <button type="button" class="faq-question-btn" onclick="toggleFaq(4)" aria-expanded="false">
+            <span>How do worldwide payments work, and do I get full commercial rights?</span>
+            <span class="faq-toggle-icon" id="faq-icon-4">&#43;</span>
+          </button>
+          <div class="faq-answer-wrap">
+            <p class="faq-answer-text">We accept seamless worldwide payments via Wise and Direct Bank Transfer. Once delivered, you own 100% full commercial rights to run all photos and videos across paid social ads and your e-commerce store.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════════
+       6. TWIN GLASSMORHPIC CONTACT SECTION (#contact)
+    ════════════════════════════════════════════════════════════════ -->
+    <section class="contact-section" id="contact">
+      <div class="section-header-center">
+        <span class="section-tag">START YOUR PRODUCTION</span>
+        <h2 class="section-title">Launch Your Campaign With Adora Lab</h2>
+        <p class="section-desc">Lock in your selected production track. Your inquiry connects directly to our lead creative directors via Gmail and priority WhatsApp.</p>
+      </div>
+
+      <div class="contact-grid">
+
+        <!-- Left Glass Card: 'Get in Touch' (Privacy-First Layout) -->
+        <div class="contact-left-card">
+          <div class="contact-left-header">
+            <h2>Get in Touch</h2>
+            <p>Your selected plan is ready. Share your brand details below and we will start crafting your campaign.</p>
+
+            <!-- Glowing Trust Badges -->
+            <div class="trust-badges-list">
+              <div class="trust-badge-item">
+                <span class="trust-badge-icon">⚡</span>
+                <span class="trust-badge-text">Instant Plan Lock &amp; Priority Onboarding</span>
+              </div>
+              <div class="trust-badge-item">
+                <span class="trust-badge-icon">🌍</span>
+                <span class="trust-badge-text">Trusted by Modern Brands Worldwide</span>
+              </div>
+              <div class="trust-badge-item">
+                <span class="trust-badge-icon">🌐</span>
+                <span class="trust-badge-text">Global Digital Delivery • Easy Online Workflows</span>
+              </div>
+              <div class="trust-badge-item">
+                <span class="trust-badge-icon">🔒</span>
+                <span class="trust-badge-text">100% Character &amp; Product Consistency Guaranteed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="priority-slot-pill">
+            <span class="priority-dot-pulse"></span>
+            <span>Priority Studio Production Slots Active for Today</span>
+          </div>
+        </div>
+
+        <!-- Right Glass Card: Contact Form with Locked Plan Summary Pill -->
+        <div class="contact-right-card">
+          
+          <!-- Glowing Locked Plan Summary Pill -->
+          <div class="locked-plan-pill" id="lockedPlanPill">
+            <div class="locked-plan-content">
+              <span class="locked-check-icon">&#10003;</span>
+              <span id="lockedPlanText">Selected: Monthly Brand Booster — Cinematic Suite ($199/pack | 4 Photos + 4 Videos)</span>
+            </div>
+          </div>
+
+          <!-- Contact Form (Spam-Protected & Rate-Limited) -->
+          <form class="contact-form" id="adoraOrderForm" onsubmit="handleOrderSubmit(event)">
+            
+            <!-- Anti-Bot Honeypot Field (invisible to legitimate users) -->
+            <div style="position: absolute; opacity: 0; pointer-events: none; height: 0; width: 0; overflow: hidden; z-index: -1;" aria-hidden="true">
+              <label for="contactHoneypot">Leave this field blank</label>
+              <input type="text" id="contactHoneypot" name="_honey_trap" tabindex="-1" autocomplete="off" value="" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="clientName">Your Name *</label>
+              <input type="text" id="clientName" class="dark-glass-input" required maxlength="80" placeholder="e.g. Alexander Vance" autocomplete="name" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="clientEmail">Email Address *</label>
+              <input type="email" id="clientEmail" class="dark-glass-input" required maxlength="120" placeholder="e.g. alex@yourbrand.com" autocomplete="email" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="clientBrand">Brand / Website URL (Optional)</label>
+              <input type="text" id="clientBrand" class="dark-glass-input" maxlength="150" placeholder="e.g. brandname.com or @instagram" autocomplete="url" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="planSelector">Selected Plan &amp; Value</label>
+              <select id="planSelector" class="dark-glass-select" onchange="onManualPlanChange(this.value)">
+                <option value="starter_ugc">Adora Family Starter — UGC Essentials ($99/pack | 2 Photos + 2 Videos)</option>
+                <option value="starter_cinematic">Adora Family Starter — Cinematic Suite ($149/pack | 2 Photos + 2 Videos)</option>
+                <option value="booster_ugc">Monthly Brand Booster — UGC Essentials ($149/pack | 4 Photos + 4 Videos)</option>
+                <option value="booster_cinematic" selected>Monthly Brand Booster — Cinematic Suite ($199/pack | 4 Photos + 4 Videos)</option>
+                <option value="scale_ugc">Brand Scale Domination — UGC Essentials ($199/pack | 8 Photos + 8 Videos)</option>
+                <option value="scale_cinematic">Brand Scale Domination — Cinematic Flagship ($299/pack | 8 Photos + 8 Videos)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="clientMessage">Write your message... *</label>
+              <textarea id="clientMessage" class="dark-glass-textarea" required maxlength="3000" placeholder="Tell us about your product, visual goals, or campaign timeline..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-send-message" id="submitBtn">
+              <span>Send Message &amp; Launch Campaign</span>
+              <span style="font-size: 17px;">&#8594;</span>
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+
+    
+
+    <!-- ════════════════════════════════════════════════════════════════
+         7. CLEAN MINIMAL SINGLE-LINE FOOTER
+    ════════════════════════════════════════════════════════════════ -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        
+        <!-- Left: ADORA LAB logo + brand name -->
+        <a href="#portfolio" class="footer-brand" onclick="event.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); history.replaceState(null, '', '#portfolio');" title="Adora Lab — Scroll to Top">
+          <div class="footer-logo-box">
+            <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" class="footer-logo-img" />
+          </div>
+          <span class="footer-brand-title">ADORA LAB</span>
+        </a>
+
+        <!-- Center: Smooth-scroll links -->
+        <ul class="footer-links">
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#showcase">Services</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#why-us">Why Us</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <!-- Right: Copyright -->
+        <div class="footer-copy">
+          &copy; 2026 Adora Lab. All rights reserved. Built with 100% Brand Consistency.
+        </div>
+
+      </div>
+    </footer>
+
+  </div><!-- .page -->
+
+  <!-- ════════════════════════════════════════════════════════════════
+       CONFIRMATION TOAST
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="confirmation-toast" id="confirmationToast">
+    <div class="toast-check-icon">&#10003;</div>
+    <div>
+      <div style="font-size: 14.5px; font-weight: 800; margin-bottom: 2px;">Inquiry Dispatched!</div>
+      <div style="font-size: 12.5px; color: #bae6fd;">Gmail alert sent &amp; opening direct WhatsApp for priority onboarding.</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       FULL-SCREEN GLASSMORPHIC PORTFOLIO VAULT MODAL (14 ITEMS)
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="vault-modal" id="portfolioVaultModal">
+    <div class="vault-header">
+      <div class="vault-title-wrap">
+        <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" class="vault-logo-icon" />
+        <div class="vault-title-text">
+          <h3>Adora Lab Media Vault</h3>
+          <p>Curated AI Commercials, UGC Creatives &amp; Brand Posters</p>
+        </div>
+      </div>
+
+      <div class="vault-filter-tabs">
+        <button class="vault-tab-btn active" data-filter="all" onclick="filterVault('all')">All (14)</button>
+        <button class="vault-tab-btn" data-filter="posters" onclick="filterVault('posters')">Posters (8)</button>
+        <button class="vault-tab-btn" data-filter="cinematic" onclick="filterVault('cinematic')">Cinematic Ads (3)</button>
+        <button class="vault-tab-btn" data-filter="ugc" onclick="filterVault('ugc')">UGC Videos (3)</button>
+      </div>
+
+      <button class="vault-close-btn" onclick="closeVaultModal()" aria-label="Close Vault">&times;</button>
+    </div>
+
+    <div class="vault-body">
+      <div class="vault-grid" id="vaultGrid">
+
+        <!-- 8 CLOUDINARY POSTERS -->
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306" alt="Brand Poster 1" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Commercial Visual I</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png" alt="Brand Poster 2" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Commercial Visual II</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp" alt="Brand Poster 3" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Muse Creative III</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png" alt="Brand Poster 4" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Visual Concept IV</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png" alt="Adora Lab Men's Day Poster" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Men's Day Campaign</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg" alt="Cake O' Clock" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Cake O' Clock</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png" alt="Brand Poster 7" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Studio Creative VII</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="posters">
+          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png')">
+            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png" alt="Cake O' Cloke Luxury 01" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Cake O' Cloke Luxury</span>
+            <span class="vault-card-tag">Poster</span>
+          </div>
+        </div>
+
+        <!-- 3 CINEMATIC FLAGSHIP CLOUDINARY VIDEOS -->
+        <div class="vault-card" data-category="cinematic">
+          <div class="vault-media-box" title="Click to play with sound">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075208/lv_0_20261031190549.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Flagship Hero Commercial</span>
+            <span class="vault-card-tag video">Cinematic Ad</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="cinematic">
+          <div class="vault-media-box" title="Click to play with sound">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075207/lv_0_20261031195109.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Atmospheric Story Ad</span>
+            <span class="vault-card-tag video">Cinematic Ad</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="cinematic">
+          <div class="vault-media-box" title="Click to play with sound">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794076053/handmade_gift.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Cinematic Brand Narrative</span>
+            <span class="vault-card-tag video">Cinematic Ad</span>
+          </div>
+        </div>
+
+        <!-- 3 UGC ESSENTIALS CLOUDINARY VIDEOS -->
+        <div class="vault-card" data-category="ugc">
+          <div class="vault-media-box" title="Click to play with sound">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075192/lv_0_20261101191608.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Viral UGC Hook Video</span>
+            <span class="vault-card-tag">UGC Creator</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="ugc">
+          <div class="vault-media-box" title="Click to play with sound">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075200/lv_0_20261029140825.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Product Showcase Dialogue</span>
+            <span class="vault-card-tag">UGC Creator</span>
+          </div>
+        </div>
+
+        <div class="vault-card" data-category="ugc">
+          <div class="vault-media-box" title="Click to play with sound">
+            <video 
+              src="https://res.cloudinary.com/gjsyepos/video/upload/v1794075707/shirt_ad.mp4" 
+              playsinline 
+              preload="metadata" 
+              loop 
+              style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
+              class="adora-html5-video">
+            </video>
+            <div class="video-glass-ctrl-btn" title="Tap to Play with Sound">
+              <span class="ctrl-icon-play"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span>
+              <span class="ctrl-icon-pause" style="display:none;"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span>
+              <span class="ctrl-label">Play Sound</span>
+            </div>
+          </div>
+          <div class="vault-card-info">
+            <span class="vault-card-title">Social Direct Response Ad</span>
+            <span class="vault-card-tag">UGC Creator</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX ZOOM MODAL -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+    <div class="lightbox-content-box" onclick="event.stopPropagation()">
+      <button class="lightbox-close-btn" onclick="closeLightbox()">&times;</button>
+      <img id="lightboxImg" src="" alt="Full view preview" />
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       SCRIPTS: DRAWER, SUB-TIER LOGIC, AUTO-FILL, FORMSUBMIT, & SCROLL ENGINE
+  ════════════════════════════════════════════════════════════════ -->
+  <script>
+    // ─── 8 CLOUDINARY POSTER URLS ───
+    var posterUrls = [
+      'https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306',
+      'https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png',
+      'https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp',
+      'https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png',
+      'https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png',
+      'https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg',
+      'https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png',
+      'https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png'
+    ];
+
+    // ─── NAVBAR ACTIVE PILL SCROLLSPY & UNIFIED TOP ANCHOR ───
+    (function initNavScrollspy() {
+      var navLinks = document.querySelectorAll('.pill-nav-links .nav-pill-item');
+      if (!navLinks || !navLinks.length) return;
+
+      var sections = [
+        { id: 'portfolio', link: document.querySelector('.pill-nav-links a[href="#portfolio"]') },
+        { id: 'showcase', link: document.querySelector('.pill-nav-links a[href="#showcase"]') },
+        { id: 'pricing', link: document.querySelector('.pill-nav-links a[href="#pricing"]') },
+        { id: 'why-us', link: document.querySelector('.pill-nav-links a[href="#why-us"]') },
+        { id: 'faq', link: document.querySelector('.pill-nav-links a[href="#faq"]') },
+        { id: 'contact', link: document.querySelector('.pill-nav-links a[href="#contact"]') }
+      ];
+
+      function setActivePill(targetLink) {
+        navLinks.forEach(function (l) { l.classList.remove('active-pill'); });
+        if (targetLink) targetLink.classList.add('active-pill');
+      }
+
+      navLinks.forEach(function (link) {
+        link.addEventListener('click', function () {
+          setActivePill(link);
+        });
+      });
+
+      var scrollTimer = null;
+      window.addEventListener('scroll', function () {
+        if (scrollTimer) return;
+        scrollTimer = setTimeout(function () {
+          scrollTimer = null;
+          var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          if (scrollY < 220) {
+            setActivePill(sections[0].link);
+            return;
+          }
+          var current = sections[0].link;
+          for (var i = 0; i < sections.length; i++) {
+            var el = document.getElementById(sections[i].id);
+            if (el) {
+              var top = el.getBoundingClientRect().top + scrollY - 160;
+              if (scrollY >= top) {
+                current = sections[i].link;
+              }
+            }
+          }
+          if (current) setActivePill(current);
+        }, 50);
+      }, { passive: true });
+    })();
+
+    // ─── STUDIO DRAWER CONTROLS ───
+    function openDrawer() {
+      var d = document.getElementById('studioDrawer');
+      var b = document.getElementById('drawerBackdrop');
+      if (d && b) {
+        d.classList.add('active');
+        b.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeDrawer() {
+      var d = document.getElementById('studioDrawer');
+      var b = document.getElementById('drawerBackdrop');
+      if (d && b) {
+        d.classList.remove('active');
+        b.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    function triggerDrawerProject() {
+      closeDrawer();
+      var c = document.getElementById('contact');
+      if (c) c.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ─── 1. INTERACTIVE PRICING SUB-TIERS STATE & AUTO-FILL ───
+    var planState = {
+      starter: {
+        package: 'Adora Family Starter',
+        track: 'UGC Essentials',
+        price: '$99',
+        deliverables: '2 AI Photos + 2 UGC Videos',
+        dropdownVal: 'starter_ugc'
+      },
+      booster: {
+        package: 'Monthly Brand Booster',
+        track: 'Cinematic Suite',
+        price: '$199',
+        deliverables: '4 AI Photos + 4 Cinematic Videos',
+        dropdownVal: 'booster_cinematic'
+      },
+      scale: {
+        package: 'Brand Scale Domination',
+        track: 'Cinematic Flagship',
+        price: '$299',
+        deliverables: '8 AI Photos + 8 Cinematic Videos',
+        dropdownVal: 'scale_cinematic'
+      }
+    };
+
+    var currentSelectedOrder = {
+      package: 'Monthly Brand Booster',
+      track: 'Cinematic Suite',
+      price: '$199',
+      deliverables: '4 AI Photos + 4 Cinematic Videos',
+      dropdownVal: 'booster_cinematic'
+    };
+
+    function selectSubTier(cardKey, track, price, deliverables) {
+      var cardEl = document.getElementById('card-' + cardKey);
+      if (!cardEl) return;
+
+      var subPlans = cardEl.querySelectorAll('.sub-plan');
+      subPlans.forEach(function (sp) {
+        var label = sp.querySelector('.sub-plan-label');
+        if (label && label.textContent.trim().toLowerCase() === track.toLowerCase()) {
+          sp.classList.add('active-tier');
+        } else {
+          sp.classList.remove('active-tier');
+        }
+      });
+
+      var dropdownKey = cardKey + '_' + (track.toLowerCase().indexOf('ugc') !== -1 ? 'ugc' : 'cinematic');
+      planState[cardKey] = {
+        package: cardEl.querySelector('.card-plan-name').textContent.trim(),
+        track: track,
+        price: price,
+        deliverables: deliverables,
+        dropdownVal: dropdownKey
+      };
+
+      var btn = document.getElementById('btn-' + cardKey);
+      if (btn) {
+        btn.textContent = 'Get Started — ' + price;
+      }
+    }
+
+    // ─── 2. 'GET STARTED' BUTTON SMOOTH REDIRECT & AUTO-FILL ───
+    function triggerGetStarted(cardKey) {
+      var chosen = planState[cardKey];
+      if (!chosen) return;
+
+      currentSelectedOrder = Object.assign({}, chosen);
+      syncOrderToForm();
+
+      var contactEl = document.getElementById('contact');
+      if (contactEl) {
+        contactEl.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      var pill = document.getElementById('lockedPlanPill');
+      if (pill) {
+        pill.style.transform = 'scale(1.03)';
+        pill.style.boxShadow = '0 0 35px rgba(56, 189, 248, 0.85)';
+        setTimeout(function () {
+          pill.style.transform = '';
+          pill.style.boxShadow = '';
+        }, 600);
+      }
+    }
+
+    function syncOrderToForm() {
+      var pillText = document.getElementById('lockedPlanText');
+      if (pillText) {
+        pillText.textContent = 'Selected: ' + currentSelectedOrder.package + ' — ' + currentSelectedOrder.track + ' (' + currentSelectedOrder.price + '/pack | ' + currentSelectedOrder.deliverables + ')';
+      }
+
+      var selector = document.getElementById('planSelector');
+      if (selector && currentSelectedOrder.dropdownVal) {
+        selector.value = currentSelectedOrder.dropdownVal;
+      }
+    }
+
+    function onManualPlanChange(val) {
+      var planMap = {
+        'starter_ugc': { package: 'Adora Family Starter', track: 'UGC Essentials', price: '$99', deliverables: '2 AI Photos + 2 UGC Videos' },
+        'starter_cinematic': { package: 'Adora Family Starter', track: 'Cinematic Suite', price: '$149', deliverables: '2 AI Photos + 2 Cinematic Videos' },
+        'booster_ugc': { package: 'Monthly Brand Booster', track: 'UGC Essentials', price: '$149', deliverables: '4 AI Photos + 4 UGC Videos' },
+        'booster_cinematic': { package: 'Monthly Brand Booster', track: 'Cinematic Suite', price: '$199', deliverables: '4 AI Photos + 4 Cinematic Videos' },
+        'scale_ugc': { package: 'Brand Scale Domination', track: 'UGC Essentials', price: '$199', deliverables: '8 AI Photos + 8 UGC Videos' },
+        'scale_cinematic': { package: 'Brand Scale Domination', track: 'Cinematic Flagship', price: '$299', deliverables: '8 AI Photos + 8 Cinematic Videos' }
+      };
+
+      if (planMap[val]) {
+        currentSelectedOrder = Object.assign({ dropdownVal: val }, planMap[val]);
+        syncOrderToForm();
+      }
+    }
+
+    // ─── 3. GMAIL (FORMSUBMIT) + WHATSAPP NOTIFICATION DISPATCH (SECURITY HARDENED) ───
+    var lastFormSubmitTime = 0;
+    var isFormSubmitting = false;
+
+    // Basic Input Sanitization to strip script injections & HTML tags
+    function sanitizeInput(str) {
+      if (typeof str !== 'string') return '';
+      return str
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+        .replace(/<[a-z/][a-z0-9]*\b[^>]*>/gi, '')
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+\s*=/gi, '')
+        .trim();
+    }
+
+    // Email format validation regex
+    function isValidEmail(email) {
+      var emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+      return emailRegex.test(email);
+    }
+
+    function handleOrderSubmit(e) {
+      e.preventDefault();
+
+      // 1. Anti-Bot Honeypot Trap
+      var hpField = document.getElementById('contactHoneypot');
+      if (hpField && hpField.value && hpField.value.trim() !== '') {
+        console.warn('Automated bot submission blocked.');
+        return;
+      }
+
+      // 2. Client-side Rate Limiting Protection (5-second spam prevention)
+      var now = Date.now();
+      if (isFormSubmitting || (now - lastFormSubmitTime < 5000)) {
+        var remainingSeconds = Math.ceil((5000 - (now - lastFormSubmitTime)) / 1000);
+        alert('Please wait ' + (remainingSeconds > 0 ? remainingSeconds : 1) + ' second(s) before sending another inquiry.');
+        return;
+      }
+
+      var nameInput = document.getElementById('clientName');
+      var emailInput = document.getElementById('clientEmail');
+      var brandInput = document.getElementById('clientBrand');
+      var messageInput = document.getElementById('clientMessage');
+      var submitBtn = document.getElementById('submitBtn');
+
+      var rawName = nameInput.value;
+      var rawEmail = emailInput.value;
+      var rawBrand = brandInput ? brandInput.value : '';
+      var rawMessage = messageInput.value;
+
+      // 3. Input Sanitization
+      var name = sanitizeInput(rawName);
+      var email = sanitizeInput(rawEmail);
+      var brand = sanitizeInput(rawBrand);
+      var message = sanitizeInput(rawMessage);
+
+      // 4. Strict Validation
+      if (!name || name.length < 2) {
+        alert('Please enter your name (minimum 2 characters).');
+        nameInput.focus();
+        return;
+      }
+
+      if (!email || !isValidEmail(email)) {
+        alert('Please enter a valid email address (e.g. name@brand.com).');
+        emailInput.focus();
+        return;
+      }
+
+      if (!message || message.length < 5) {
+        alert('Please write a brief description of your project (minimum 5 characters).');
+        messageInput.focus();
+        return;
+      }
+
+      // 5. Activate Rate-Limit & 'Sending...' State (Disabled for 5 seconds)
+      isFormSubmitting = true;
+      lastFormSubmitTime = now;
+
+      var originalBtnHtml = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<span>Sending...</span>';
+      submitBtn.disabled = true;
+
+      // 6. Secure HTTPS AJAX POST to FormSubmit
+      var subjectLine = '🔥 New [' + currentSelectedOrder.price + '] Order Inquiry: ' + currentSelectedOrder.package + ' (' + currentSelectedOrder.track + ')';
+      var payload = {
+        _subject: subjectLine,
+        'Client Name': name,
+        'Email Address': email,
+        'Brand / Website': brand || 'Not provided',
+        'Selected Package': currentSelectedOrder.package,
+        'Track': currentSelectedOrder.track,
+        'Package Value': currentSelectedOrder.price,
+        'Deliverables': currentSelectedOrder.deliverables,
+        'Brief / Message': message,
+        _captcha: 'false'
+      };
+
+      fetch('https://formsubmit.co/ajax/hello.adoralabs@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      }).then(function (res) {
+        return res.json();
+      }).catch(function (err) {
+        console.warn('FormSubmit notification error (proceeding to WhatsApp):', err);
+      });
+
+      // 7. Trigger Internal WhatsApp Alert
+      var waLines = [
+        '🚀 *New Adora Lab Order Inquiry*',
+        '• *Selected Plan:* ' + currentSelectedOrder.package,
+        '• *Track:* ' + currentSelectedOrder.track,
+        '• *Package Value:* ' + currentSelectedOrder.price + ' (' + currentSelectedOrder.deliverables + ')',
+        '• *Client Name:* ' + name,
+        '• *Email:* ' + email,
+        '• *Brand:* ' + (brand || 'N/A'),
+        '• *Brief:* ' + message
+      ];
+      var waText = waLines.join('\n');
+
+      window.open('https://wa.me/919801531802?text=' + encodeURIComponent(waText), '_blank');
+
+      // 8. Show Animated Confirmation Toast
+      var toast = document.getElementById('confirmationToast');
+      if (toast) {
+        toast.classList.add('show');
+        setTimeout(function () {
+          toast.classList.remove('show');
+        }, 6500);
+      }
+
+      // Reset Form fields
+      nameInput.value = '';
+      emailInput.value = '';
+      if (brandInput) brandInput.value = '';
+      messageInput.value = '';
+
+      // 9. Re-enable button after full 5-second cooldown
+      setTimeout(function () {
+        submitBtn.innerHTML = originalBtnHtml;
+        submitBtn.disabled = false;
+        isFormSubmitting = false;
+      }, 5000);
+    }
+
+    syncOrderToForm();
+
+    // ─── 4. POSTER CAROUSEL (RIGHT-SIDE CARD) ───
+    var currentSlideIndex = 0;
+    var slideTimer = null;
+    var slides = document.querySelectorAll('.preview-slide');
+    var dots = document.querySelectorAll('.preview-dot');
+
+    function setSlide(index) {
+      currentSlideIndex = (index + slides.length) % slides.length;
+      slides.forEach(function (s, i) {
+        if (i === currentSlideIndex) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+      dots.forEach(function (d, i) {
+        if (i === currentSlideIndex) {
+          d.classList.add('active');
+        } else {
+          d.classList.remove('active');
+        }
+      });
+    }
+
+    function nextSlide(e) {
+      if (e) e.stopPropagation();
+      setSlide(currentSlideIndex + 1);
+    }
+
+    function prevSlide(e) {
+      if (e) e.stopPropagation();
+      setSlide(currentSlideIndex - 1);
+    }
+
+    function startAutoSlide() {
+      stopAutoSlide();
+      slideTimer = setInterval(function () {
+        setSlide(currentSlideIndex + 1);
+      }, 3500);
+    }
+
+    function stopAutoSlide() {
+      if (slideTimer) clearInterval(slideTimer);
+    }
+
+    var sliderBox = document.getElementById('previewCardContainer');
+    if (sliderBox) {
+      sliderBox.addEventListener('mouseenter', stopAutoSlide);
+      sliderBox.addEventListener('mouseleave', startAutoSlide);
+
+      var touchStartX = 0;
+      var touchEndX = 0;
+      sliderBox.addEventListener('touchstart', function (e) {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      sliderBox.addEventListener('touchend', function (e) {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 45) {
+          nextSlide();
+        } else if (touchEndX - touchStartX > 45) {
+          prevSlide();
+        }
+      }, { passive: true });
+    }
+    startAutoSlide();
+
+    // ─── 5. LIGHTBOX ZOOM MODAL ───
+    var lightbox = document.getElementById('lightboxModal');
+    var lightboxImg = document.getElementById('lightboxImg');
+
+    function openLightbox(index) {
+      var url = posterUrls[index] || posterUrls[0];
+      openLightboxFromSrc(url);
+    }
+
+    function openLightboxFromSrc(src) {
+      lightboxImg.src = src;
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+    }
+
+    // ─── 6. FULL-SCREEN MEDIA VAULT MODAL ───
+    var vaultModal = document.getElementById('portfolioVaultModal');
+
+    function openVaultModal(defaultFilter) {
+      vaultModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      if (defaultFilter) {
+        filterVault(defaultFilter);
+      }
+    }
+
+    function closeVaultModal() {
+      vaultModal.classList.remove('active');
+      document.body.style.overflow = '';
+      if (window.pauseAllAdoraVideos) {
+        window.pauseAllAdoraVideos();
+      }
+    }
+
+    function filterVault(category) {
+      var tabBtns = document.querySelectorAll('.vault-tab-btn');
+      tabBtns.forEach(function (btn) {
+        if (btn.getAttribute('data-filter') === category) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      var cards = document.querySelectorAll('.vault-card');
+      cards.forEach(function (card) {
+        if (category === 'all' || card.getAttribute('data-category') === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeVaultModal();
+        closeDrawer();
+      }
+    });
+
+    
+    // ─── FAQ ACCORDION HANDLER ───
+    function toggleFaq(index) {
+      var item = document.getElementById('faq-item-' + index);
+      var icon = document.getElementById('faq-icon-' + index);
+      var btn = item ? item.querySelector('.faq-question-btn') : null;
+      if (!item) return;
+
+      var isOpen = item.classList.contains('active');
+
+      if (isOpen) {
+        item.classList.remove('active');
+        if (icon) icon.innerHTML = '&#43;';
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      } else {
+        item.classList.add('active');
+        if (icon) icon.innerHTML = '&minus;';
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    // ─── 7. UNIFIED HTML5 VIDEO PLAYER MANAGER (MUTUAL EXCLUSIVE AUDIO + HOVER PREVIEWS) ───
+    (function initAdoraVideoPlayers() {
+      function pauseAllVideosExcept(targetVideo) {
+        document.querySelectorAll('video').forEach(function (v) {
+          if (v !== targetVideo) {
+            v.pause();
+            v.muted = true;
+            var outerCard = v.closest('.flagship-card, .ugc-card');
+            if (outerCard) {
+              outerCard.classList.remove('video-is-playing');
+            }
+            var parent = v.closest('.video-frame-box, .vault-media-box');
+            if (parent) {
+              var btn = parent.querySelector('.video-glass-ctrl-btn');
+              if (btn) {
+                btn.classList.remove('is-playing');
+                var playIcon = btn.querySelector('.ctrl-icon-play');
+                var pauseIcon = btn.querySelector('.ctrl-icon-pause');
+                var label = btn.querySelector('.ctrl-label');
+                if (playIcon) playIcon.style.display = 'inline-block';
+                if (pauseIcon) pauseIcon.style.display = 'none';
+                if (label) label.textContent = 'Play Sound';
+              }
+            }
+          }
+        });
+      }
+
+      function toggleVideoPlaySound(cardBox) {
+        var video = cardBox.querySelector('video');
+        if (!video) return;
+
+        var outerCard = cardBox.closest('.flagship-card, .ugc-card');
+        var btn = cardBox.querySelector('.video-glass-ctrl-btn');
+        var playIcon = btn ? btn.querySelector('.ctrl-icon-play') : null;
+        var pauseIcon = btn ? btn.querySelector('.ctrl-icon-pause') : null;
+        var label = btn ? btn.querySelector('.ctrl-label') : null;
+
+        if (!video.paused && !video.muted) {
+          // Currently playing with sound -> pause it
+          video.pause();
+          video.muted = true;
+          if (outerCard) {
+            outerCard.classList.remove('video-is-playing');
+          }
+          if (btn) {
+            btn.classList.remove('is-playing');
+            if (playIcon) playIcon.style.display = 'inline-block';
+            if (pauseIcon) pauseIcon.style.display = 'none';
+            if (label) label.textContent = 'Play Sound';
+          }
+        } else {
+          // Pause all other playing videos
+          pauseAllVideosExcept(video);
+
+          // Play this video with sound
+          video.muted = false;
+          var p = video.play();
+          if (p !== undefined) {
+            p.then(function () {
+              if (outerCard) {
+                outerCard.classList.add('video-is-playing');
+              }
+              if (btn) {
+                btn.classList.add('is-playing');
+                if (playIcon) playIcon.style.display = 'none';
+                if (pauseIcon) pauseIcon.style.display = 'inline-block';
+                if (label) label.textContent = 'Pause Sound';
+              }
+            }).catch(function () {
+              // In case browser requires muted playback
+              video.muted = true;
+              video.play().catch(function () {});
+            });
+          }
+        }
+      }
+
+      function setupVideoEvents() {
+        var allVideoCards = document.querySelectorAll('.video-frame-box, .vault-media-box');
+        allVideoCards.forEach(function (box) {
+          var video = box.querySelector('video');
+          if (!video) return;
+
+          // Desktop hover preview: play muted if not currently active with audio
+          box.addEventListener('mouseenter', function () {
+            if (video.paused && video.muted) {
+              video.muted = true;
+              video.play().catch(function () {});
+            }
+          });
+
+          box.addEventListener('mouseleave', function () {
+            // If in preview mode (muted), pause and rewind
+            if (video.muted && !video.paused) {
+              video.pause();
+              video.currentTime = 0;
+            }
+          });
+
+          // Click anywhere on card or control button toggles audio playback
+          box.addEventListener('click', function (e) {
+            toggleVideoPlaySound(box);
+          });
+
+          // Reset control pill when video is paused
+          video.addEventListener('pause', function () {
+            if (video.muted) return; // ignore hover preview pause
+            var outerCard = box.closest('.flagship-card, .ugc-card');
+            if (outerCard) {
+              outerCard.classList.remove('video-is-playing');
+            }
+            var btn = box.querySelector('.video-glass-ctrl-btn');
+            if (btn) {
+              btn.classList.remove('is-playing');
+              var playIcon = btn.querySelector('.ctrl-icon-play');
+              var pauseIcon = btn.querySelector('.ctrl-icon-pause');
+              var label = btn.querySelector('.ctrl-label');
+              if (playIcon) playIcon.style.display = 'inline-block';
+              if (pauseIcon) pauseIcon.style.display = 'none';
+              if (label) label.textContent = 'Play Sound';
+            }
+          });
+        });
+      }
+
+      window.pauseAllAdoraVideos = function () {
+        pauseAllVideosExcept(null);
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupVideoEvents);
+      } else {
+        setupVideoEvents();
+      }
+    })();
+
+    // ─── 7. HIGH-PERFORMANCE LOSSLESS HTML5 CANVAS IMAGE SEQUENCE RUNNER ───
+    (function () {
+      var TOTAL_FRAMES = 300;
+      var canvas = document.getElementById('canvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d', { alpha: false });
+
+      var frames = new Array(TOTAL_FRAMES);
+      var loaded = new Array(TOTAL_FRAMES);
+      for (var i = 0; i < TOTAL_FRAMES; i++) loaded[i] = false;
+
+      var targetProgress = 0;
+      var currentProgress = 0;
+      var lastIndex = -1;
+      var LERP = 0.09;
+
+      function padZero(num, size) {
+        var s = '0000' + num;
+        return s.slice(-size);
+      }
+
+      function getFrameUrl(idx) {
+        return '/frames/frame_' + padZero(idx, 4) + '.webp';
+      }
+
+      function getMaxScroll() {
+        var doc = document.documentElement;
+        return Math.max(doc.scrollHeight, document.body.scrollHeight) - window.innerHeight;
+      }
+
+      function getScrollProgress() {
+        var maxScroll = getMaxScroll();
+        if (maxScroll <= 0) return 0;
+        var top = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        return Math.min(1, Math.max(0, top / maxScroll));
+      }
+
+      function resizeCanvas() {
+        var dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(window.innerWidth * dpr);
+        canvas.height = Math.round(window.innerHeight * dpr);
+        drawFrameByIndex(lastIndex >= 0 ? lastIndex : 0, true);
+      }
+
+      function drawImageCover(img) {
+        if (!img || !img.complete || img.naturalWidth === 0) return;
+        var cw = canvas.width, ch = canvas.height;
+        var iw = img.naturalWidth, ih = img.naturalHeight;
+        var scale = Math.max(cw / iw, ch / ih);
+        var nw = iw * scale, nh = ih * scale;
+        var isMobile = window.innerWidth <= 768;
+        var nx = (cw - nw) / 2;
+        var ny = isMobile ? 0 : (ch - nh) / 2;
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, nx, ny, nw, nh);
+      }
+
+      function findClosestLoaded(index) {
+        if (loaded[index] && frames[index]) return frames[index];
+        for (var offset = 1; offset < TOTAL_FRAMES; offset++) {
+          var prev = index - offset;
+          if (prev >= 0 && loaded[prev] && frames[prev]) return frames[prev];
+          var next = index + offset;
+          if (next < TOTAL_FRAMES && loaded[next] && frames[next]) return frames[next];
+        }
+        return null;
+      }
+
+      function drawFrameByIndex(index, force) {
+        if (index === lastIndex && !force) return;
+        var img = frames[index];
+        if (!img || !img.complete || img.naturalWidth === 0) {
+          img = findClosestLoaded(index);
+        }
+        if (img && img.complete && img.naturalWidth > 0) {
+          drawImageCover(img);
+          lastIndex = index;
+        }
+      }
+
+      function onScroll() {
+        targetProgress = getScrollProgress();
+      }
+
+      function tick() {
+        var delta = targetProgress - currentProgress;
+        if (Math.abs(delta) > 0.00005) {
+          currentProgress += delta * LERP;
+        } else {
+          currentProgress = targetProgress;
+        }
+        var frameIndex = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.round(currentProgress * (TOTAL_FRAMES - 1))));
+        drawFrameByIndex(frameIndex, false);
+        requestAnimationFrame(tick);
+      }
+
+      function preload() {
+        var f0 = new Image();
+        f0.src = getFrameUrl(0);
+        f0.onload = function () {
+          loaded[0] = true;
+          frames[0] = f0;
+          drawFrameByIndex(0, true);
+        };
+        frames[0] = f0;
+
+        for (var i = 1; i < TOTAL_FRAMES; i++) {
+          (function (idx) {
+            var img = new Image();
+            img.src = getFrameUrl(idx);
+            img.onload = function () {
+              loaded[idx] = true;
+              frames[idx] = img;
+              var curIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.round(currentProgress * (TOTAL_FRAMES - 1))));
+              if (curIdx === idx) drawFrameByIndex(idx, true);
+            };
+            frames[idx] = img;
+          })(i);
+        }
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      resizeCanvas();
+      onScroll();
+      preload();
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>

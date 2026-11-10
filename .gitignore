@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Temporary / Uncompressed archive folders
+ezgif-12766a44c61d9679-jpg/
+New folder/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
