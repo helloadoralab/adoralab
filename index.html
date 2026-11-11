@@ -2441,9 +2441,368 @@
       text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
     }
 
+    .footer-copy-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
     .footer-copy {
       font-size: 12.5px;
       color: rgba(255, 255, 255, 0.65);
+    }
+
+    .footer-legal-row {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.04em;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .footer-legal-link {
+      color: rgba(255, 255, 255, 0.45);
+      text-decoration: none;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .footer-legal-link:hover {
+      color: #1E6FFF;
+      text-shadow: 0 0 8px rgba(30, 111, 255, 0.6);
+    }
+
+    .footer-legal-dot {
+      color: rgba(255, 255, 255, 0.35);
+      user-select: none;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SLEEK GLASSMORHPIC LEGAL & POLICIES MODAL
+    ════════════════════════════════════════════════════════════════ */
+    .legal-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100000;
+      background: rgba(4, 8, 24, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .legal-modal-backdrop.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .legal-modal-card {
+      background: rgba(10, 15, 44, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(30, 111, 255, 0.35);
+      border-radius: 20px;
+      max-width: 620px;
+      width: 100%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(30, 111, 255, 0.25);
+      overflow: hidden;
+      animation: legalModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes legalModalPop {
+      0% {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .legal-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(120, 180, 255, 0.18);
+      background: rgba(8, 13, 38, 0.75);
+      flex-shrink: 0;
+      gap: 16px;
+    }
+
+    .legal-header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .legal-logo-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: #ffffff;
+      padding: 2px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(30, 111, 255, 0.45);
+      flex-shrink: 0;
+    }
+
+    .legal-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .legal-modal-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .legal-modal-subtitle {
+      font-size: 11px;
+      color: rgba(186, 230, 253, 0.75);
+      margin: 2px 0 0;
+      line-height: 1.2;
+    }
+
+    .legal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      font-size: 20px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .legal-close-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      transform: scale(1.06);
+    }
+
+    .legal-tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: rgba(6, 10, 30, 0.85);
+      border-bottom: 1px solid rgba(120, 180, 255, 0.12);
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+
+    .legal-tab-btn {
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .legal-tab-btn:hover {
+      color: #ffffff;
+      border-color: rgba(56, 189, 248, 0.5);
+      background: rgba(30, 111, 255, 0.15);
+    }
+
+    .legal-tab-btn.active {
+      background: #1E6FFF;
+      color: #ffffff;
+      border-color: #38bdf8;
+      box-shadow: 0 0 14px rgba(30, 111, 255, 0.6);
+    }
+
+    .legal-modal-body {
+      padding: 22px 24px;
+      overflow-y: auto;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .legal-modal-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .legal-modal-body::-webkit-scrollbar-track {
+      background: rgba(6, 11, 28, 0.4);
+    }
+
+    .legal-modal-body::-webkit-scrollbar-thumb {
+      background: rgba(30, 111, 255, 0.4);
+      border-radius: 3px;
+    }
+
+    .legal-modal-body::-webkit-scrollbar-thumb:hover {
+      background: #38bdf8;
+    }
+
+    .legal-section {
+      background: rgba(14, 22, 54, 0.55);
+      border: 1px solid rgba(120, 180, 255, 0.18);
+      border-radius: 14px;
+      padding: 16px 18px;
+      transition: all 0.25s ease;
+    }
+
+    .legal-section:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(14, 22, 54, 0.75);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .legal-section.legal-highlight {
+      border-color: #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+      background: rgba(30, 111, 255, 0.12);
+    }
+
+    .legal-sec-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .legal-sec-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(30, 111, 255, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .legal-sec-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .legal-sec-content p {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0;
+    }
+
+    .legal-email-link {
+      color: #38bdf8;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .legal-email-link:hover {
+      color: #93c5fd;
+    }
+
+    .legal-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-top: 1px solid rgba(120, 180, 255, 0.15);
+      background: rgba(6, 10, 30, 0.85);
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    .legal-guarantee-badge {
+      font-size: 11px;
+      color: rgba(186, 230, 253, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legal-dismiss-btn {
+      padding: 8px 18px;
+      border-radius: 9999px;
+      background: rgba(30, 111, 255, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .legal-dismiss-btn:hover {
+      background: #1E6FFF;
+      box-shadow: 0 0 14px rgba(30, 111, 255, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .legal-modal-card {
+        max-height: 85vh;
+      }
+      .legal-modal-header {
+        padding: 16px 18px;
+      }
+      .legal-tabs-bar {
+        padding: 10px 18px;
+      }
+      .legal-modal-body {
+        padding: 16px 18px;
+        gap: 12px;
+      }
+      .legal-modal-footer {
+        padding: 12px 18px;
+        flex-direction: column-reverse;
+        gap: 10px;
+        align-items: stretch;
+      }
+      .legal-dismiss-btn {
+        width: 100%;
+        padding: 10px 0;
+      }
+      .legal-guarantee-badge {
+        justify-content: center;
+        text-align: center;
+      }
     }
 
     /* ════════════════════════════════════════════════════════════════
@@ -4328,9 +4687,16 @@
           <li><a href="#contact">Contact</a></li>
         </ul>
 
-        <!-- Right: Copyright -->
-        <div class="footer-copy">
-          &copy; 2026 Adora Lab. All rights reserved. Built with 100% Brand Consistency.
+        <!-- Right: Copyright & Micro Subtle Legal Links -->
+        <div class="footer-copy-block">
+          <div class="footer-copy">
+            &copy; 2026 Adora Lab. All rights reserved. Built with 100% Brand Consistency.
+          </div>
+          <div class="footer-legal-row">
+            <a href="javascript:void(0)" class="footer-legal-link" onclick="openLegalModal('privacy')">Privacy Policy</a>
+            <span class="footer-legal-dot">•</span>
+            <a href="javascript:void(0)" class="footer-legal-link" onclick="openLegalModal('terms')">Terms &amp; Refund Policy</a>
+          </div>
         </div>
 
       </div>
@@ -4599,6 +4965,132 @@
     <div class="lightbox-content-box" onclick="event.stopPropagation()">
       <button class="lightbox-close-btn" onclick="closeLightbox()">&times;</button>
       <img id="lightboxImg" src="" alt="Full view preview" />
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       SLEEK GLASSMORHPIC LEGAL & POLICIES MODAL
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="legal-modal-backdrop" id="legalModalBackdrop" onclick="handleLegalBackdropClick(event)">
+    <div class="legal-modal-card" id="legalModalCard" role="dialog" aria-modal="true" aria-labelledby="legalModalTitle">
+      
+      <!-- Modal Header -->
+      <div class="legal-modal-header">
+        <div class="legal-header-brand">
+          <div class="legal-logo-box">
+            <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" class="legal-logo-img" />
+          </div>
+          <div>
+            <h3 class="legal-modal-title" id="legalModalTitle">Adora Lab Legal &amp; Policies</h3>
+            <p class="legal-modal-subtitle">Transparent Creative Workflows • Zero Geographical Limits</p>
+          </div>
+        </div>
+        <button type="button" class="legal-close-btn" onclick="closeLegalModal()" aria-label="Close Legal Modal">&times;</button>
+      </div>
+
+      <!-- Navigation Tabs Bar -->
+      <div class="legal-tabs-bar">
+        <button type="button" class="legal-tab-btn active" id="tab-all" onclick="setLegalTab('all')">All Policies</button>
+        <button type="button" class="legal-tab-btn" id="tab-privacy" onclick="setLegalTab('privacy')">Privacy Policy</button>
+        <button type="button" class="legal-tab-btn" id="tab-terms" onclick="setLegalTab('terms')">Terms &amp; Refund Policy</button>
+      </div>
+
+      <!-- Scrollable Modal Body -->
+      <div class="legal-modal-body" id="legalModalBody">
+        
+        <!-- Section 1: Data Privacy & Brand Confidentiality -->
+        <div class="legal-section" id="legal-sec-privacy" data-category="privacy">
+          <div class="legal-sec-header">
+            <div class="legal-sec-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <h4 class="legal-sec-title">Data Privacy &amp; Brand Confidentiality</h4>
+          </div>
+          <div class="legal-sec-content">
+            <p>Adora Lab collects only essential contact details (name, email, WhatsApp/message) and raw product photos strictly for project communication and creative production. All raw product photos, unreleased designs, and brand assets remain 100% confidential and are never sold or shared with third parties.</p>
+          </div>
+        </div>
+
+        <!-- Section 2: Service Deliverables & Revisions -->
+        <div class="legal-section" id="legal-sec-deliverables" data-category="terms">
+          <div class="legal-sec-header">
+            <div class="legal-sec-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+              </svg>
+            </div>
+            <h4 class="legal-sec-title">Service Deliverables &amp; Revisions</h4>
+          </div>
+          <div class="legal-sec-content">
+            <p>All commercial videos, UGC ads, and brand posters are delivered digitally in Full HD (1080p) within an average of 3–4 days (zero physical shipping). Packages include 2 free revisions for Starter/UGC tiers and up to 4 free revisions for Booster/Scale tiers.</p>
+          </div>
+        </div>
+
+        <!-- Section 3: 50/50 Payment Structure & Refund Policy -->
+        <div class="legal-section" id="legal-sec-payment" data-category="terms">
+          <div class="legal-sec-header">
+            <div class="legal-sec-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+              </svg>
+            </div>
+            <h4 class="legal-sec-title">50/50 Payment Structure &amp; Refund Policy</h4>
+          </div>
+          <div class="legal-sec-content">
+            <p>Projects operate on a transparent 50% advance deposit to initiate production and 50% balance upon final approval/delivery, processed securely via Wise or Direct Bank Transfer. Because custom AI creative production requires immediate studio compute and art direction, the 50% advance deposit is non-refundable once production begins; however, we guarantee revision support within your package scope to ensure complete brand alignment.</p>
+          </div>
+        </div>
+
+        <!-- Section 4: Intellectual Property & Portfolio Rights -->
+        <div class="legal-section" id="legal-sec-ip" data-category="terms">
+          <div class="legal-sec-header">
+            <div class="legal-sec-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="7"></circle>
+                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+              </svg>
+            </div>
+            <h4 class="legal-sec-title">Intellectual Property &amp; Portfolio Rights</h4>
+          </div>
+          <div class="legal-sec-content">
+            <p>Upon full (100%) payment, the client receives full commercial usage rights for all final delivered video and poster assets. Adora Lab retains the right to showcase completed deliverables in its agency portfolio and social channels unless a prior Non-Disclosure Request (NDA) is agreed upon in writing.</p>
+          </div>
+        </div>
+
+        <!-- Section 5: Official Contact -->
+        <div class="legal-section" id="legal-sec-contact" data-category="all">
+          <div class="legal-sec-header">
+            <div class="legal-sec-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            <h4 class="legal-sec-title">Official Contact</h4>
+          </div>
+          <div class="legal-sec-content">
+            <p>For any privacy, NDA, data deletion, or support inquiries, contact <a href="mailto:hello.adoralabs@gmail.com" class="legal-email-link">hello.adoralabs@gmail.com</a>.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="legal-modal-footer">
+        <span class="legal-guarantee-badge">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          100% Brand Consistency &amp; Client Privacy Guaranteed
+        </span>
+        <button type="button" class="legal-dismiss-btn" onclick="closeLegalModal()">Close</button>
+      </div>
+
     </div>
   </div>
 
@@ -5107,8 +5599,89 @@
         closeLightbox();
         closeVaultModal();
         closeDrawer();
+        closeLegalModal();
       }
     });
+
+    // ─── SLEEK GLASSMORPHIC LEGAL & POLICIES MODAL ───
+    var legalModal = document.getElementById('legalModalBackdrop');
+
+    function openLegalModal(tab) {
+      if (!legalModal) {
+        legalModal = document.getElementById('legalModalBackdrop');
+      }
+      if (!legalModal) return;
+
+      legalModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      setLegalTab(tab || 'all');
+    }
+
+    function closeLegalModal() {
+      if (!legalModal) {
+        legalModal = document.getElementById('legalModalBackdrop');
+      }
+      if (!legalModal) return;
+
+      legalModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function handleLegalBackdropClick(e) {
+      if (e.target && e.target.id === 'legalModalBackdrop') {
+        closeLegalModal();
+      }
+    }
+
+    function setLegalTab(tab) {
+      var tabBtns = document.querySelectorAll('.legal-tab-btn');
+      tabBtns.forEach(function (btn) {
+        if (btn.id === 'tab-' + tab) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      var sections = document.querySelectorAll('.legal-section');
+      sections.forEach(function (sec) {
+        var cat = sec.getAttribute('data-category');
+        if (tab === 'all') {
+          sec.style.display = 'block';
+          sec.classList.remove('legal-highlight');
+        } else if (tab === 'privacy') {
+          if (cat === 'privacy' || cat === 'all') {
+            sec.style.display = 'block';
+            if (cat === 'privacy') {
+              sec.classList.add('legal-highlight');
+            } else {
+              sec.classList.remove('legal-highlight');
+            }
+          } else {
+            sec.style.display = 'none';
+            sec.classList.remove('legal-highlight');
+          }
+        } else if (tab === 'terms') {
+          if (cat === 'terms' || cat === 'all') {
+            sec.style.display = 'block';
+            if (cat === 'terms') {
+              sec.classList.add('legal-highlight');
+            } else {
+              sec.classList.remove('legal-highlight');
+            }
+          } else {
+            sec.style.display = 'none';
+            sec.classList.remove('legal-highlight');
+          }
+        }
+      });
+
+      var body = document.getElementById('legalModalBody');
+      if (body) {
+        body.scrollTop = 0;
+      }
+    }
 
     
     // ─── FAQ ACCORDION HANDLER ───
