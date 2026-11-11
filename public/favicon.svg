@@ -1,12 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#4D8DFF"/>
-      <stop offset="1" stop-color="#1E6FFF"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="16" fill="#0A0F2C"/>
-  <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" fill="none" stroke="#1E6FFF" stroke-opacity="0.5" stroke-width="2"/>
-  <path d="M32 14 L46.5 50 H38.8 L32 31.8 L25.2 50 H17.5 Z" fill="url(#g)"/>
-  <rect x="26.5" y="42" width="11" height="3.5" rx="1.75" fill="url(#g)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Crisp Circular White Background -->
+  <circle cx="256" cy="256" r="256" fill="#FFFFFF"/>
+  <!-- Subtle Electric Blue Brand Outer Ring -->
+  <circle cx="256" cy="256" r="250" fill="none" stroke="#1E6FFF" stroke-width="4" stroke-opacity="0.35"/>
+
+  <!-- Official Adora Lab Geometric 'A' Triangle Emblem (~75% of Circle Diameter) -->
+  <!-- Outer Triangle Frame & Diagonal Legs (Deep Navy #0A0F2C) -->
+  <path d="M 256 67 L 455.5 445 L 392 445 L 256 192 L 120 445 L 56.5 445 Z" fill="#0A0F2C"/>
+  
+  <!-- Center Inset Triangle (Deep Navy #0A0F2C) -->
+  <polygon points="256,273 323,397 189,397" fill="#0A0F2C"/>
+  
+  <!-- Bottom Horizontal Bar (Deep Navy #0A0F2C) -->
+  <polygon points="187,422 325,422 352,445 160,445" fill="#0A0F2C"/>
 </svg>
