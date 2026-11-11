@@ -1705,6 +1705,8 @@
       align-items: baseline;
       gap: 6px;
       margin-bottom: 10px;
+      white-space: nowrap;
+      min-height: 38px;
     }
 
     .price-amount {
@@ -1713,6 +1715,7 @@
       letter-spacing: -0.035em;
       color: #ffffff;
       text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+      white-space: nowrap;
     }
 
     .price-unit {
@@ -4196,7 +4199,8 @@
           <!-- Sub-Tier 1: UGC Essentials ($99) -->
           <div class="sub-plan" 
                onclick="selectSubTier('starter', 'UGC Essentials', '$99', '2 AI Photos + 2 UGC Videos')"
-               data-tier="ugc">
+               data-tier="ugc"
+               data-plan-key="starter_ugc">
             <div class="sub-plan-header-row">
               <div class="sub-plan-label">UGC Essentials</div>
               <div class="tier-radio-indicator"></div>
@@ -4224,7 +4228,8 @@
           <!-- Sub-Tier 2: Cinematic Suite ($149) -->
           <div class="sub-plan" 
                onclick="selectSubTier('starter', 'Cinematic Suite', '$149', '2 AI Photos + 2 Cinematic Videos')"
-               data-tier="cinematic">
+               data-tier="cinematic"
+               data-plan-key="starter_cinematic">
             <div class="sub-plan-header-row">
               <div class="sub-plan-label">Cinematic Suite</div>
               <div class="tier-radio-indicator"></div>
@@ -4272,7 +4277,8 @@
           <!-- Sub-Tier 1: UGC Essentials ($149) -->
           <div class="sub-plan" 
                onclick="selectSubTier('booster', 'UGC Essentials', '$149', '4 AI Photos + 4 UGC Videos')"
-               data-tier="ugc">
+               data-tier="ugc"
+               data-plan-key="booster_ugc">
             <div class="sub-plan-header-row">
               <div class="sub-plan-label">UGC Essentials</div>
               <div class="tier-radio-indicator"></div>
@@ -4300,7 +4306,8 @@
           <!-- Sub-Tier 2: Cinematic Suite ($199) -->
           <div class="sub-plan" 
                onclick="selectSubTier('booster', 'Cinematic Suite', '$199', '4 AI Photos + 4 Cinematic Videos')"
-               data-tier="cinematic">
+               data-tier="cinematic"
+               data-plan-key="booster_cinematic">
             <div class="sub-plan-header-row">
               <div class="sub-plan-label">Cinematic Suite</div>
               <div class="tier-radio-indicator"></div>
@@ -4348,7 +4355,8 @@
           <!-- Sub-Tier 1: UGC Essentials ($199) -->
           <div class="sub-plan" 
                onclick="selectSubTier('scale', 'UGC Essentials', '$199', '8 AI Photos + 8 UGC Videos')"
-               data-tier="ugc">
+               data-tier="ugc"
+               data-plan-key="scale_ugc">
             <div class="sub-plan-header-row">
               <div class="sub-plan-label">UGC Essentials</div>
               <div class="tier-radio-indicator"></div>
@@ -4376,7 +4384,8 @@
           <!-- Sub-Tier 2: Cinematic Flagship ($299) -->
           <div class="sub-plan" 
                onclick="selectSubTier('scale', 'Cinematic Flagship', '$299', '8 AI Photos + 8 Cinematic Videos')"
-               data-tier="cinematic">
+               data-tier="cinematic"
+               data-plan-key="scale_cinematic">
             <div class="sub-plan-header-row">
               <div class="sub-plan-label">Cinematic Flagship</div>
               <div class="tier-radio-indicator"></div>
@@ -5187,6 +5196,245 @@
       if (c) c.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // ─── 0. SILENT PURCHASING POWER PARITY (PPP) PRICING ENGINE ───
+    var PPP_RATES = {
+      USD: {
+        symbol: '$',
+        starter_ugc: '$99',
+        starter_cinematic: '$149',
+        booster_ugc: '$149',
+        booster_cinematic: '$199',
+        scale_ugc: '$199',
+        scale_cinematic: '$299'
+      },
+      GBP: {
+        symbol: '£',
+        starter_ugc: '£89',
+        starter_cinematic: '£129',
+        booster_ugc: '£129',
+        booster_cinematic: '£179',
+        scale_ugc: '£179',
+        scale_cinematic: '£249'
+      },
+      EUR: {
+        symbol: '€',
+        starter_ugc: '€99',
+        starter_cinematic: '€149',
+        booster_ugc: '€149',
+        booster_cinematic: '€199',
+        scale_ugc: '€199',
+        scale_cinematic: '€299'
+      },
+      AED: {
+        symbol: 'AED',
+        starter_ugc: '399 AED',
+        starter_cinematic: '599 AED',
+        booster_ugc: '599 AED',
+        booster_cinematic: '799 AED',
+        scale_ugc: '799 AED',
+        scale_cinematic: '1,099 AED'
+      },
+      CAD: {
+        symbol: 'CA$',
+        starter_ugc: 'CA$139',
+        starter_cinematic: 'CA$199',
+        booster_ugc: 'CA$199',
+        booster_cinematic: 'CA$269',
+        scale_ugc: 'CA$269',
+        scale_cinematic: 'CA$399'
+      },
+      AUD: {
+        symbol: 'A$',
+        starter_ugc: 'A$149',
+        starter_cinematic: 'A$229',
+        booster_ugc: 'A$229',
+        booster_cinematic: 'A$299',
+        scale_ugc: 'A$299',
+        scale_cinematic: 'A$449'
+      },
+      NZD: {
+        symbol: 'NZ$',
+        starter_ugc: 'NZ$169',
+        starter_cinematic: 'NZ$249',
+        booster_ugc: 'NZ$249',
+        booster_cinematic: 'NZ$329',
+        scale_ugc: 'NZ$329',
+        scale_cinematic: 'NZ$499'
+      },
+      SGD: {
+        symbol: 'S$',
+        starter_ugc: 'S$139',
+        starter_cinematic: 'S$199',
+        booster_ugc: 'S$199',
+        booster_cinematic: 'S$269',
+        scale_ugc: 'S$269',
+        scale_cinematic: 'S$399'
+      }
+    };
+
+    var currentRegion = 'USD';
+    var currentPPP = PPP_RATES.USD;
+
+    function detectRegionByTimezone() {
+      try {
+        var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').toLowerCase();
+        
+        // Strict India check FIRST: visitors from India MUST strictly see USD ($), NOT INR
+        if (tz.indexOf('kolkata') !== -1 || tz.indexOf('calcutta') !== -1 || tz.indexOf('india') !== -1) {
+          return 'USD';
+        }
+        
+        // United Kingdom
+        if (tz.indexOf('london') !== -1 || tz === 'europe/belfast') {
+          return 'GBP';
+        }
+        
+        // UAE / Dubai
+        if (tz.indexOf('dubai') !== -1 || tz.indexOf('muscat') !== -1) {
+          return 'AED';
+        }
+        
+        // Singapore
+        if (tz.indexOf('singapore') !== -1) {
+          return 'SGD';
+        }
+        
+        // New Zealand
+        if (tz.indexOf('auckland') !== -1 || tz.indexOf('chatham') !== -1) {
+          return 'NZD';
+        }
+        
+        // Australia
+        if (tz.indexOf('australia') !== -1 || tz.indexOf('sydney') !== -1 || tz.indexOf('melbourne') !== -1 || tz.indexOf('brisbane') !== -1 || tz.indexOf('perth') !== -1 || tz.indexOf('adelaide') !== -1 || tz.indexOf('darwin') !== -1 || tz.indexOf('hobart') !== -1) {
+          return 'AUD';
+        }
+        
+        // Canada
+        if (tz.indexOf('canada') !== -1 || tz.indexOf('toronto') !== -1 || tz.indexOf('vancouver') !== -1 || tz.indexOf('montreal') !== -1 || tz.indexOf('halifax') !== -1 || tz.indexOf('edmonton') !== -1 || tz.indexOf('winnipeg') !== -1 || tz.indexOf('st_johns') !== -1) {
+          return 'CAD';
+        }
+        
+        // Eurozone
+        var eurTimezones = [
+          'berlin', 'paris', 'amsterdam', 'dublin', 'madrid', 'rome', 'vienna', 'brussels', 'helsinki', 'lisbon',
+          'athens', 'copenhagen', 'stockholm', 'oslo', 'prague', 'warsaw', 'bratislava', 'budapest', 'ljubljana',
+          'tallinn', 'riga', 'vilnius', 'luxembourg', 'nicosia', 'malta'
+        ];
+        for (var i = 0; i < eurTimezones.length; i++) {
+          if (tz.indexOf(eurTimezones[i]) !== -1) {
+            return 'EUR';
+          }
+        }
+      } catch (e) {}
+      return 'USD';
+    }
+
+    function applyPPPRegion(regionKey) {
+      if (!PPP_RATES[regionKey]) regionKey = 'USD';
+      currentRegion = regionKey;
+      currentPPP = PPP_RATES[regionKey];
+
+      // 1. Update sub-plan price labels on cards
+      var planKeys = ['starter_ugc', 'starter_cinematic', 'booster_ugc', 'booster_cinematic', 'scale_ugc', 'scale_cinematic'];
+      planKeys.forEach(function (key) {
+        var el = document.querySelector('.sub-plan[data-plan-key="' + key + '"] .price-amount');
+        if (el) {
+          el.textContent = currentPPP[key];
+        }
+      });
+
+      // 2. Update card CTA buttons with matching tier prices
+      var btnStarter = document.getElementById('btn-starter');
+      if (btnStarter) {
+        var starterPrice = (planState.starter && planState.starter.track === 'Cinematic Suite') ? currentPPP.starter_cinematic : currentPPP.starter_ugc;
+        btnStarter.textContent = 'Get Started — ' + starterPrice;
+      }
+      var btnBooster = document.getElementById('btn-booster');
+      if (btnBooster) {
+        var boosterPrice = (planState.booster && planState.booster.track === 'UGC Essentials') ? currentPPP.booster_ugc : currentPPP.booster_cinematic;
+        btnBooster.textContent = 'Get Started — ' + boosterPrice;
+      }
+      var btnScale = document.getElementById('btn-scale');
+      if (btnScale) {
+        var scalePrice = (planState.scale && planState.scale.track === 'UGC Essentials') ? currentPPP.scale_ugc : currentPPP.scale_cinematic;
+        btnScale.textContent = 'Get Started — ' + scalePrice;
+      }
+
+      // 3. Update dropdown options in contact form
+      var optConfigs = [
+        { val: 'starter_ugc', text: 'Adora Family Starter — UGC Essentials (' + currentPPP.starter_ugc + '/pack | 2 Photos + 2 Videos)' },
+        { val: 'starter_cinematic', text: 'Adora Family Starter — Cinematic Suite (' + currentPPP.starter_cinematic + '/pack | 2 Photos + 2 Videos)' },
+        { val: 'booster_ugc', text: 'Monthly Brand Booster — UGC Essentials (' + currentPPP.booster_ugc + '/pack | 4 Photos + 4 Videos)' },
+        { val: 'booster_cinematic', text: 'Monthly Brand Booster — Cinematic Suite (' + currentPPP.booster_cinematic + '/pack | 4 Photos + 4 Videos)' },
+        { val: 'scale_ugc', text: 'Brand Scale Domination — UGC Essentials (' + currentPPP.scale_ugc + '/pack | 8 Photos + 8 Videos)' },
+        { val: 'scale_cinematic', text: 'Brand Scale Domination — Cinematic Flagship (' + currentPPP.scale_cinematic + '/pack | 8 Photos + 8 Videos)' }
+      ];
+
+      optConfigs.forEach(function (cfg) {
+        var opt = document.querySelector('#planSelector option[value="' + cfg.val + '"]');
+        if (opt) {
+          opt.textContent = cfg.text;
+        }
+      });
+
+      // 4. Update planState with localized prices
+      if (planState.starter) {
+        planState.starter.price = (planState.starter.track === 'Cinematic Suite') ? currentPPP.starter_cinematic : currentPPP.starter_ugc;
+      }
+      if (planState.booster) {
+        planState.booster.price = (planState.booster.track === 'UGC Essentials') ? currentPPP.booster_ugc : currentPPP.booster_cinematic;
+      }
+      if (planState.scale) {
+        planState.scale.price = (planState.scale.track === 'UGC Essentials') ? currentPPP.scale_ugc : currentPPP.scale_cinematic;
+      }
+
+      // 5. Update currentSelectedOrder if one is already selected
+      if (currentSelectedOrder && currentSelectedOrder.dropdownVal) {
+        currentSelectedOrder.price = currentPPP[currentSelectedOrder.dropdownVal];
+        syncOrderToForm();
+      }
+    }
+
+    function fetchGeoBackup() {
+      try {
+        if (sessionStorage.getItem('adora_geo_checked')) return;
+        fetch('https://ipapi.co/json/', { cache: 'no-store' })
+          .then(function(res) {
+            if (!res.ok) throw new Error('Network error');
+            return res.json();
+          })
+          .then(function(data) {
+            sessionStorage.setItem('adora_geo_checked', '1');
+            var country = (data && data.country_code ? data.country_code.toUpperCase() : '');
+            var newRegion = null;
+            if (country === 'IN') {
+              newRegion = 'USD';
+            } else if (country === 'GB') {
+              newRegion = 'GBP';
+            } else if (['DE', 'NL', 'IE', 'FR', 'ES', 'IT', 'AT', 'BE', 'FI', 'PT', 'GR', 'CY', 'EE', 'LV', 'LT', 'LU', 'MT', 'SK', 'SI'].indexOf(country) !== -1) {
+              newRegion = 'EUR';
+            } else if (country === 'AE') {
+              newRegion = 'AED';
+            } else if (country === 'CA') {
+              newRegion = 'CAD';
+            } else if (country === 'AU') {
+              newRegion = 'AUD';
+            } else if (country === 'NZ') {
+              newRegion = 'NZD';
+            } else if (country === 'SG') {
+              newRegion = 'SGD';
+            } else if (country === 'US') {
+              newRegion = 'USD';
+            }
+            if (newRegion && newRegion !== currentRegion) {
+              sessionStorage.setItem('adora_ppp_region', newRegion);
+              applyPPPRegion(newRegion);
+            }
+          })
+          .catch(function() {});
+      } catch (e) {}
+    }
+
     // ─── 1. INTERACTIVE PRICING SUB-TIERS STATE & AUTO-FILL ───
     var planState = {
       starter: {
@@ -5231,11 +5479,14 @@
         }
       });
 
-      var dropdownKey = cardKey + '_' + (track.toLowerCase().indexOf('ugc') !== -1 ? 'ugc' : 'cinematic');
+      var trackKey = (track.toLowerCase().indexOf('ugc') !== -1 ? 'ugc' : 'cinematic');
+      var dropdownKey = cardKey + '_' + trackKey;
+      var effectivePrice = (currentPPP && currentPPP[dropdownKey]) ? currentPPP[dropdownKey] : price;
+
       var chosenPlan = {
         package: cardEl.querySelector('.card-plan-name').textContent.trim(),
         track: track,
-        price: price,
+        price: effectivePrice,
         deliverables: deliverables,
         dropdownVal: dropdownKey
       };
@@ -5245,7 +5496,7 @@
 
       var btn = document.getElementById('btn-' + cardKey);
       if (btn) {
-        btn.textContent = 'Get Started — ' + price;
+        btn.textContent = 'Get Started — ' + effectivePrice;
       }
     }
 
@@ -5301,23 +5552,46 @@
           selector.value = currentSelectedOrder.dropdownVal;
         }
       }
+
+      var msgBox = document.getElementById('clientMessage');
+      if (msgBox && (!msgBox.value || msgBox.value.indexOf("I'd like to book") !== -1)) {
+        if (currentSelectedOrder && currentSelectedOrder.package) {
+          msgBox.placeholder = "I'd like to book " + currentSelectedOrder.package + " (" + currentSelectedOrder.price + "). Tell us about your product or campaign...";
+        }
+      }
     }
 
     function onManualPlanChange(val) {
-      var planMap = {
-        'starter_ugc': { cardKey: 'starter', package: 'Adora Family Starter', track: 'UGC Essentials', price: '$99', deliverables: '2 AI Photos + 2 UGC Videos' },
-        'starter_cinematic': { cardKey: 'starter', package: 'Adora Family Starter', track: 'Cinematic Suite', price: '$149', deliverables: '2 AI Photos + 2 Cinematic Videos' },
-        'booster_ugc': { cardKey: 'booster', package: 'Monthly Brand Booster', track: 'UGC Essentials', price: '$149', deliverables: '4 AI Photos + 4 UGC Videos' },
-        'booster_cinematic': { cardKey: 'booster', package: 'Monthly Brand Booster', track: 'Cinematic Suite', price: '$199', deliverables: '4 AI Photos + 4 Cinematic Videos' },
-        'scale_ugc': { cardKey: 'scale', package: 'Brand Scale Domination', track: 'UGC Essentials', price: '$199', deliverables: '8 AI Photos + 8 UGC Videos' },
-        'scale_cinematic': { cardKey: 'scale', package: 'Brand Scale Domination', track: 'Cinematic Flagship', price: '$299', deliverables: '8 AI Photos + 8 Cinematic Videos' }
+      var planMeta = {
+        'starter_ugc': { cardKey: 'starter', package: 'Adora Family Starter', track: 'UGC Essentials', deliverables: '2 AI Photos + 2 UGC Videos' },
+        'starter_cinematic': { cardKey: 'starter', package: 'Adora Family Starter', track: 'Cinematic Suite', deliverables: '2 AI Photos + 2 Cinematic Videos' },
+        'booster_ugc': { cardKey: 'booster', package: 'Monthly Brand Booster', track: 'UGC Essentials', deliverables: '4 AI Photos + 4 UGC Videos' },
+        'booster_cinematic': { cardKey: 'booster', package: 'Monthly Brand Booster', track: 'Cinematic Suite', deliverables: '4 AI Photos + 4 Cinematic Videos' },
+        'scale_ugc': { cardKey: 'scale', package: 'Brand Scale Domination', track: 'UGC Essentials', deliverables: '8 AI Photos + 8 UGC Videos' },
+        'scale_cinematic': { cardKey: 'scale', package: 'Brand Scale Domination', track: 'Cinematic Flagship', deliverables: '8 AI Photos + 8 Cinematic Videos' }
       };
 
-      if (planMap[val]) {
-        var info = planMap[val];
-        selectSubTier(info.cardKey, info.track, info.price, info.deliverables);
+      if (planMeta[val]) {
+        var info = planMeta[val];
+        var price = (currentPPP && currentPPP[val]) ? currentPPP[val] : '$99';
+        selectSubTier(info.cardKey, info.track, price, info.deliverables);
       }
     }
+
+    // Initialize PPP immediately for zero flicker
+    try {
+      var cachedPPP = sessionStorage.getItem('adora_ppp_region');
+      if (cachedPPP && PPP_RATES[cachedPPP]) {
+        applyPPPRegion(cachedPPP);
+      } else {
+        var tzRegion = detectRegionByTimezone();
+        sessionStorage.setItem('adora_ppp_region', tzRegion);
+        applyPPPRegion(tzRegion);
+      }
+    } catch (e) {
+      applyPPPRegion('USD');
+    }
+    setTimeout(fetchGeoBackup, 500);
 
     // ─── 3. GMAIL (FORMSUBMIT) + WHATSAPP NOTIFICATION DISPATCH (SECURITY HARDENED) ───
     var lastFormSubmitTime = 0;
@@ -5402,6 +5676,21 @@
       var originalBtnHtml = submitBtn.innerHTML;
       submitBtn.innerHTML = '<span>Sending...</span>';
       submitBtn.disabled = true;
+
+      // Ensure order selection is populated with localized rates
+      if (!currentSelectedOrder || !currentSelectedOrder.package) {
+        var selVal = (document.getElementById('planSelector') && document.getElementById('planSelector').value) || 'booster_cinematic';
+        onManualPlanChange(selVal);
+      }
+      if (!currentSelectedOrder) {
+        currentSelectedOrder = {
+          package: 'Monthly Brand Booster',
+          track: 'Cinematic Suite',
+          price: (currentPPP && currentPPP.booster_cinematic) || '$199',
+          deliverables: '4 AI Photos + 4 Cinematic Videos',
+          dropdownVal: 'booster_cinematic'
+        };
+      }
 
       // 6. Secure HTTPS AJAX POST to FormSubmit
       var subjectLine = '🔥 New [' + currentSelectedOrder.price + '] Order Inquiry: ' + currentSelectedOrder.package + ' (' + currentSelectedOrder.track + ')';
