@@ -1184,6 +1184,32 @@
       pointer-events: auto;
     }
 
+    /* ─── HIDE NATIVE CHROMECAST & REMOTE PLAYBACK OVERLAY ICONS ─── */
+    video::-internal-media-controls-overlay-cast-button {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+    }
+
+    video::-webkit-media-controls-wireless-playback-picker-button {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+    }
+
+    video::-webkit-media-controls-overlay-cast-button {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      visibility: hidden !important;
+    }
+
+    video::-webkit-media-controls-enclosure {
+      display: none !important;
+    }
+
     /* Glassmorphic Play/Pause + Audio Toggle Pill */
     .video-glass-ctrl-btn {
       position: absolute;
@@ -4015,6 +4041,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4035,6 +4064,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4054,6 +4086,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4115,6 +4150,9 @@
                 playsinline 
                 preload="none" 
                 loop 
+                disableRemotePlayback 
+                disablePictureInPicture 
+                controlsList="nodownload nofullscreen noremoteplayback"
                 style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
                 class="adora-html5-video">
               </video>
@@ -4134,6 +4172,9 @@
                 playsinline 
                 preload="none" 
                 loop 
+                disableRemotePlayback 
+                disablePictureInPicture 
+                controlsList="nodownload nofullscreen noremoteplayback"
                 style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
                 class="adora-html5-video">
               </video>
@@ -4153,6 +4194,9 @@
                 playsinline 
                 preload="none" 
                 loop 
+                disableRemotePlayback 
+                disablePictureInPicture 
+                controlsList="nodownload nofullscreen noremoteplayback"
                 style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
                 class="adora-html5-video">
               </video>
@@ -4839,6 +4883,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4861,6 +4908,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4883,6 +4933,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4906,6 +4959,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4928,6 +4984,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -4950,6 +5009,9 @@
               playsinline 
               preload="none" 
               loop 
+              disableRemotePlayback 
+              disablePictureInPicture 
+              controlsList="nodownload nofullscreen noremoteplayback"
               style="width:100%; height:100%; object-fit:cover; border-radius:24px; cursor:pointer;"
               class="adora-html5-video">
             </video>
@@ -6072,6 +6134,17 @@
       }
 
       function setupVideoEvents() {
+        // Enforce Remote Playback & PIP disablement across all videos so mobile Chrome never renders cast overlay
+        document.querySelectorAll('video').forEach(function (v) {
+          try {
+            v.disableRemotePlayback = true;
+            v.disablePictureInPicture = true;
+            v.setAttribute('disableremoteplayback', '');
+            v.setAttribute('disablepictureinpicture', '');
+            v.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback');
+          } catch (e) {}
+        });
+
         var allVideoCards = document.querySelectorAll('.video-frame-box, .vault-media-box');
         allVideoCards.forEach(function (box) {
           var video = box.querySelector('video');
@@ -6327,6 +6400,15 @@
           }
           // Do not load video files on initial page load
           v.setAttribute('preload', 'none');
+
+          // Strict JS enforcement against Chrome remote playback / cast button overlay
+          try {
+            v.disableRemotePlayback = true;
+            v.disablePictureInPicture = true;
+            v.setAttribute('disableremoteplayback', '');
+            v.setAttribute('disablepictureinpicture', '');
+            v.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback');
+          } catch (e) {}
         });
 
         // IntersectionObserver: Set preload='metadata' ONLY when user scrolls near video section
