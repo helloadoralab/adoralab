@@ -2910,13 +2910,21 @@
       display: none;
       flex-direction: column;
       opacity: 0;
-      transition: opacity 0.3s ease;
       overflow-y: auto;
+      will-change: opacity;
     }
 
     .vault-modal.active {
       display: flex;
-      opacity: 1;
+    }
+
+    .vault-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-height: 100%;
+      will-change: transform, opacity;
+      transform-origin: center top;
     }
 
     .vault-header {
@@ -3166,24 +3174,24 @@
       border-color: rgba(255, 87, 34, 0.4);
     }
 
-    /* LIGHTBOX ZOOM MODAL */
+    /* LIGHTBOX ZOOM MODAL (iOS FLIP ORIGIN-AWARE SPRING ZOOM) */
     .lightbox-modal {
       position: fixed;
       inset: 0;
       z-index: 200000;
-      background: rgba(4, 7, 16, 0.92);
-      backdrop-filter: blur(28px);
+      background: rgba(6, 10, 28, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       display: none;
       align-items: center;
       justify-content: center;
       padding: 30px;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      will-change: opacity;
     }
 
     .lightbox-modal.active {
       display: flex;
-      opacity: 1;
     }
 
     .lightbox-content-box {
@@ -3195,6 +3203,8 @@
       border: 1.5px solid rgba(120, 180, 255, 0.4);
       box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 50px rgba(30, 111, 255, 0.6);
       background: #060a18;
+      will-change: transform, opacity;
+      transform-origin: center center;
     }
 
     .lightbox-content-box img {
@@ -3218,6 +3228,18 @@
       color: #ffffff;
       display: flex;
       align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .lightbox-close-btn:hover {
+      background: #ff5722;
+      border-color: #ff8a65;
+      transform: rotate(90deg);
+    }
       justify-content: center;
       font-size: 20px;
       cursor: pointer;
@@ -4078,7 +4100,7 @@
         <div class="hero-right">
           <div class="hero-preview-card" id="previewCardContainer">
             <!-- Click-to-Zoom Expand Button -->
-            <button class="preview-expand-btn" aria-label="Open Full Lightbox" onclick="openLightbox(currentSlideIndex)">
+            <button class="preview-expand-btn" aria-label="Open Full Lightbox" onclick="openLightbox(currentSlideIndex, event)">
               &#8599;
             </button>
 
@@ -4088,7 +4110,7 @@
 
             <!-- 8 Slide Images -->
             <div class="hero-preview-slider" id="previewSlider">
-              <div class="preview-slide active" data-index="0" onclick="openLightbox(0)">
+              <div class="preview-slide active" data-index="0" onclick="openLightbox(0, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306" 
                   alt="Brand Poster 1" 
@@ -4096,7 +4118,7 @@
                   style="width:100%; height:100%; object-fit:cover;" 
                 />
               </div>
-              <div class="preview-slide" data-index="1" onclick="openLightbox(1)">
+              <div class="preview-slide" data-index="1" onclick="openLightbox(1, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png" 
                   alt="Brand Poster 2" 
@@ -4104,7 +4126,7 @@
                   style="width:100%; height:100%; object-fit:cover;" 
                 />
               </div>
-              <div class="preview-slide" data-index="2" onclick="openLightbox(2)">
+              <div class="preview-slide" data-index="2" onclick="openLightbox(2, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp" 
                   alt="Brand Poster 3" 
@@ -4112,7 +4134,7 @@
                   style="width:100%; height:100%; object-fit:cover;" 
                 />
               </div>
-              <div class="preview-slide" data-index="3" onclick="openLightbox(3)">
+              <div class="preview-slide" data-index="3" onclick="openLightbox(3, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png" 
                   alt="Brand Poster 4" 
@@ -4120,7 +4142,7 @@
                   style="width:100%; height:100%; object-fit:cover;" 
                 />
               </div>
-              <div class="preview-slide" data-index="4" onclick="openLightbox(4)">
+              <div class="preview-slide" data-index="4" onclick="openLightbox(4, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png" 
                   alt="Brand Poster 5 — Men's Day" 
@@ -4128,7 +4150,7 @@
                   style="width:100%; height:100%; object-fit:cover;" 
                 />
               </div>
-              <div class="preview-slide" data-index="5" onclick="openLightbox(5)">
+              <div class="preview-slide" data-index="5" onclick="openLightbox(5, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg" 
                   alt="Brand Poster 6 — Cake O' Clock" 
@@ -4136,7 +4158,7 @@
                   style="width:100%; height:100%; object-fit:cover;" 
                 />
               </div>
-              <div class="preview-slide" data-index="6" onclick="openLightbox(6)">
+              <div class="preview-slide" data-index="6" onclick="openLightbox(6, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png" 
                   alt="Brand Poster 7" 
@@ -4144,7 +4166,7 @@
                   style="width:100%; height:100%; object-fit:cover;" 
                 />
               </div>
-              <div class="preview-slide" data-index="7" onclick="openLightbox(7)">
+              <div class="preview-slide" data-index="7" onclick="openLightbox(7, event)">
                 <img 
                   src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png" 
                   alt="Brand Poster 8 — Cake O' Cloke Luxury" 
@@ -4928,104 +4950,105 @@
        FULL-SCREEN GLASSMORPHIC PORTFOLIO VAULT MODAL (14 ITEMS)
   ════════════════════════════════════════════════════════════════ -->
   <div class="vault-modal" id="portfolioVaultModal">
-    <div class="vault-header">
-      <div class="vault-title-wrap">
-        <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" class="vault-logo-icon" />
-        <div class="vault-title-text">
-          <h3>Adora Lab Media Vault</h3>
-          <p>Curated AI Commercials, UGC Creatives &amp; Brand Posters</p>
+    <div class="vault-container" id="vaultContainer">
+      <div class="vault-header">
+        <div class="vault-title-wrap">
+          <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" class="vault-logo-icon" />
+          <div class="vault-title-text">
+            <h3>Adora Lab Media Vault</h3>
+            <p>Curated AI Commercials, UGC Creatives &amp; Brand Posters</p>
+          </div>
         </div>
+
+        <div class="vault-filter-tabs">
+          <div class="vault-sliding-pill" id="vaultSlidingPill" aria-hidden="true"></div>
+          <button class="vault-tab-btn active" data-filter="all" onclick="filterVault('all')">All (14)</button>
+          <button class="vault-tab-btn" data-filter="posters" onclick="filterVault('posters')">Posters (8)</button>
+          <button class="vault-tab-btn" data-filter="cinematic" onclick="filterVault('cinematic')">Cinematic Ads (3)</button>
+          <button class="vault-tab-btn" data-filter="ugc" onclick="filterVault('ugc')">UGC Videos (3)</button>
+        </div>
+
+        <button class="vault-close-btn" onclick="closeVaultModal()" aria-label="Close Vault">&times;</button>
       </div>
 
-      <div class="vault-filter-tabs">
-        <div class="vault-sliding-pill" id="vaultSlidingPill" aria-hidden="true"></div>
-        <button class="vault-tab-btn active" data-filter="all" onclick="filterVault('all')">All (14)</button>
-        <button class="vault-tab-btn" data-filter="posters" onclick="filterVault('posters')">Posters (8)</button>
-        <button class="vault-tab-btn" data-filter="cinematic" onclick="filterVault('cinematic')">Cinematic Ads (3)</button>
-        <button class="vault-tab-btn" data-filter="ugc" onclick="filterVault('ugc')">UGC Videos (3)</button>
-      </div>
+      <div class="vault-body">
+        <div class="vault-grid" id="vaultGrid">
 
-      <button class="vault-close-btn" onclick="closeVaultModal()" aria-label="Close Vault">&times;</button>
-    </div>
+          <!-- 8 CLOUDINARY POSTERS -->
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306" alt="Brand Poster 1" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-title">Commercial Visual I</span>
+              <span class="vault-card-tag">Poster</span>
+            </div>
+          </div>
 
-    <div class="vault-body">
-      <div class="vault-grid" id="vaultGrid">
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png" alt="Brand Poster 2" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-title">Commercial Visual II</span>
+              <span class="vault-card-tag">Poster</span>
+            </div>
+          </div>
 
-        <!-- 8 CLOUDINARY POSTERS -->
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto,q_auto/9b1e1305-ab8c-4de9-8efe-54a9b330d306" alt="Brand Poster 1" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp" alt="Brand Poster 3" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-title">Muse Creative III</span>
+              <span class="vault-card-tag">Poster</span>
+            </div>
           </div>
-          <div class="vault-card-info">
-            <span class="vault-card-title">Commercial Visual I</span>
-            <span class="vault-card-tag">Poster</span>
-          </div>
-        </div>
 
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/f_auto/q_auto/62a25fc3-e42a-459a-87bc-dfabfd42ca56.png" alt="Brand Poster 2" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png" alt="Brand Poster 4" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-title">Visual Concept IV</span>
+              <span class="vault-card-tag">Poster</span>
+            </div>
           </div>
-          <div class="vault-card-info">
-            <span class="vault-card-title">Commercial Visual II</span>
-            <span class="vault-card-tag">Poster</span>
-          </div>
-        </div>
 
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070168/muse-image_a_adora_ko_chor_kr_sab.webp" alt="Brand Poster 3" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png" alt="Adora Lab Men's Day Poster" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-title">Men's Day Campaign</span>
+              <span class="vault-card-tag">Poster</span>
+            </div>
           </div>
-          <div class="vault-card-info">
-            <span class="vault-card-title">Muse Creative III</span>
-            <span class="vault-card-tag">Poster</span>
-          </div>
-        </div>
 
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070170/725d0f60-6ab9-4b5d-a3f5-70ee824d2d08.png" alt="Brand Poster 4" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg" alt="Cake O' Clock" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-title">Cake O' Clock</span>
+              <span class="vault-card-tag">Poster</span>
+            </div>
           </div>
-          <div class="vault-card-info">
-            <span class="vault-card-title">Visual Concept IV</span>
-            <span class="vault-card-tag">Poster</span>
-          </div>
-        </div>
 
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070172/Adora_Lab_Men_s_Day_Poster.png" alt="Adora Lab Men's Day Poster" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png" alt="Brand Poster 7" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="vault-card-info">
+              <span class="vault-card-title">Studio Creative VII</span>
+              <span class="vault-card-tag">Poster</span>
+            </div>
           </div>
-          <div class="vault-card-info">
-            <span class="vault-card-title">Men's Day Campaign</span>
-            <span class="vault-card-tag">Poster</span>
-          </div>
-        </div>
 
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/cake_o_clock.jpg" alt="Cake O' Clock" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
-          </div>
-          <div class="vault-card-info">
-            <span class="vault-card-title">Cake O' Clock</span>
-            <span class="vault-card-tag">Poster</span>
-          </div>
-        </div>
-
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070173/5e1cdf39-eb6a-4e80-bb92-a121be83b819.png" alt="Brand Poster 7" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
-          </div>
-          <div class="vault-card-info">
-            <span class="vault-card-title">Studio Creative VII</span>
-            <span class="vault-card-tag">Poster</span>
-          </div>
-        </div>
-
-        <div class="vault-card" data-category="posters">
-          <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png')">
-            <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png" alt="Cake O' Cloke Luxury 01" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
-          </div>
+          <div class="vault-card" data-category="posters">
+            <div class="vault-media-box" onclick="openLightboxFromSrc('https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png', event)">
+              <img src="https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png" alt="Cake O' Cloke Luxury 01" loading="lazy" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
           <div class="vault-card-info">
             <span class="vault-card-title">Cake O' Cloke Luxury</span>
             <span class="vault-card-tag">Poster</span>
@@ -5186,12 +5209,13 @@
 
       </div>
     </div>
-  </div>
+  </div><!-- #vaultContainer -->
+</div><!-- #portfolioVaultModal -->
 
   <!-- LIGHTBOX ZOOM MODAL -->
   <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
     <div class="lightbox-content-box" onclick="event.stopPropagation()">
-      <button class="lightbox-close-btn" onclick="closeLightbox()">&times;</button>
+      <button class="lightbox-close-btn" onclick="closeLightbox(event)">&times;</button>
       <img id="lightboxImg" src="" alt="Full view preview" />
     </div>
   </div>
@@ -6262,47 +6286,252 @@
     }
     startAutoSlide();
 
-    // ─── 5. LIGHTBOX ZOOM MODAL ───
+    // ─── 5. LIGHTBOX ZOOM MODAL (iOS ORIGIN-AWARE FLIP SPRING ZOOM) ───
     var lightbox = document.getElementById('lightboxModal');
     var lightboxImg = document.getElementById('lightboxImg');
+    var lightboxBox = document.querySelector('.lightbox-content-box');
+    var currentLightboxOrigin = null;
+    var lastLightboxDeltaX = 0;
+    var lastLightboxDeltaY = 0;
+    var lastLightboxScale = 0.5;
+    var isLightboxClosing = false;
 
-    function openLightbox(index) {
+    function resolveOriginElement(originOrEvent, srcOrIndex) {
+      if (originOrEvent) {
+        if (originOrEvent instanceof HTMLElement) return originOrEvent;
+        if (originOrEvent.currentTarget instanceof HTMLElement) return originOrEvent.currentTarget;
+        if (originOrEvent.target instanceof HTMLElement) {
+          return originOrEvent.target.closest('.vault-media-box, .vault-card, .preview-slide, .hero-preview-card') || originOrEvent.target;
+        }
+      }
+      if (window.event) {
+        var e = window.event;
+        if (e.currentTarget instanceof HTMLElement) return e.currentTarget;
+        if (e.target instanceof HTMLElement) {
+          return e.target.closest('.vault-media-box, .vault-card, .preview-slide, .hero-preview-card') || e.target;
+        }
+      }
+      if (typeof srcOrIndex === 'number') {
+        var slide = document.querySelector('.preview-slide[data-index="' + srcOrIndex + '"]') || document.querySelector('.preview-slide.active');
+        if (slide) return slide;
+      }
+      if (typeof srcOrIndex === 'string') {
+        var matchImg = document.querySelector('.vault-grid img[src="' + srcOrIndex + '"]');
+        if (matchImg) return matchImg.closest('.vault-media-box') || matchImg;
+      }
+      return document.querySelector('.preview-slide.active') || document.getElementById('previewCardContainer');
+    }
+
+    function openLightbox(index, originOrEvent) {
       var url = posterUrls[index] || posterUrls[0];
-      openLightboxFromSrc(url);
+      var resolvedOrigin = resolveOriginElement(originOrEvent, index);
+      openLightboxFromSrc(url, resolvedOrigin);
     }
 
-    function openLightboxFromSrc(src) {
+    function openLightboxFromSrc(src, originOrEvent) {
+      if (!lightbox) lightbox = document.getElementById('lightboxModal');
+      if (!lightboxImg) lightboxImg = document.getElementById('lightboxImg');
+      if (!lightboxBox) lightboxBox = document.querySelector('.lightbox-content-box');
+
+      var originEl = resolveOriginElement(originOrEvent, src);
+      currentLightboxOrigin = originEl;
+      isLightboxClosing = false;
+
       lightboxImg.src = src;
+
+      // Make visible for measurement
+      lightbox.style.display = 'flex';
       lightbox.classList.add('active');
+      lightbox.style.transition = 'none';
+      lightbox.style.opacity = '0';
+      document.body.style.overflow = 'hidden';
+
+      var originRect = originEl ? originEl.getBoundingClientRect() : null;
+      var finalRect = lightboxBox.getBoundingClientRect();
+
+      if (!originRect || finalRect.width === 0 || finalRect.height === 0) {
+        lightboxBox.style.transition = 'none';
+        lightboxBox.style.transform = 'scale(0.92)';
+        lightboxBox.style.opacity = '0';
+        void lightboxBox.offsetWidth;
+        requestAnimationFrame(function () {
+          lightbox.style.transition = 'opacity 0.35s ease';
+          lightbox.style.opacity = '1';
+          lightboxBox.style.transition = 'transform 0.46s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease-out';
+          lightboxBox.style.transform = 'translate3d(0, 0, 0) scale(1)';
+          lightboxBox.style.opacity = '1';
+        });
+        return;
+      }
+
+      var sourceCenterX = originRect.left + originRect.width / 2;
+      var sourceCenterY = originRect.top + originRect.height / 2;
+      var finalCenterX = finalRect.left + finalRect.width / 2;
+      var finalCenterY = finalRect.top + finalRect.height / 2;
+
+      var deltaX = sourceCenterX - finalCenterX;
+      var deltaY = sourceCenterY - finalCenterY;
+      var scaleX = originRect.width / finalRect.width;
+      var scaleY = originRect.height / finalRect.height;
+      var startScale = Math.min(Math.max(scaleX, scaleY), 1);
+
+      lastLightboxDeltaX = deltaX;
+      lastLightboxDeltaY = deltaY;
+      lastLightboxScale = startScale;
+
+      // Start position (FLIP invert)
+      lightboxBox.style.transition = 'none';
+      lightboxBox.style.transform = 'translate3d(' + Math.round(deltaX) + 'px, ' + Math.round(deltaY) + 'px, 0) scale(' + startScale.toFixed(4) + ')';
+      lightboxBox.style.opacity = '0.4';
+
+      void lightboxBox.offsetWidth;
+
+      // Animate to center (FLIP play)
+      requestAnimationFrame(function () {
+        lightbox.style.transition = 'opacity 0.35s ease';
+        lightbox.style.opacity = '1';
+
+        lightboxBox.style.transition = 'transform 0.46s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease-out';
+        lightboxBox.style.transform = 'translate3d(0, 0, 0) scale(1)';
+        lightboxBox.style.opacity = '1';
+      });
     }
 
-    function closeLightbox() {
-      lightbox.classList.remove('active');
+    function closeLightbox(event) {
+      if (isLightboxClosing) return;
+      if (event && event.target && event.target !== lightbox && !event.target.closest('.lightbox-close-btn')) {
+        return;
+      }
+      isLightboxClosing = true;
+
+      if (!lightbox) lightbox = document.getElementById('lightboxModal');
+      if (!lightboxBox) lightboxBox = document.querySelector('.lightbox-content-box');
+
+      var curOrigin = currentLightboxOrigin;
+      if (curOrigin && curOrigin.isConnected) {
+        var r = curOrigin.getBoundingClientRect();
+        var f = lightboxBox.getBoundingClientRect();
+        var scX = r.left + r.width / 2;
+        var scY = r.top + r.height / 2;
+        var fcX = f.left + f.width / 2;
+        var fcY = f.top + f.height / 2;
+        lastLightboxDeltaX = scX - fcX;
+        lastLightboxDeltaY = scY - fcY;
+        lastLightboxScale = Math.min(Math.max(r.width / f.width, r.height / f.height), 1);
+      }
+
+      lightbox.style.transition = 'opacity 0.32s ease';
+      lightbox.style.opacity = '0';
+
+      lightboxBox.style.transition = 'transform 0.36s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.36s cubic-bezier(0.32, 0.72, 0, 1)';
+      lightboxBox.style.transform = 'translate3d(' + Math.round(lastLightboxDeltaX) + 'px, ' + Math.round(lastLightboxDeltaY) + 'px, 0) scale(' + lastLightboxScale.toFixed(4) + ')';
+      lightboxBox.style.opacity = '0';
+
+      setTimeout(function () {
+        lightbox.style.display = 'none';
+        lightbox.classList.remove('active');
+        lightbox.style.transition = '';
+        lightbox.style.opacity = '';
+        lightboxBox.style.transition = '';
+        lightboxBox.style.transform = '';
+        lightboxBox.style.opacity = '';
+
+        var vaultOpen = document.getElementById('portfolioVaultModal') && document.getElementById('portfolioVaultModal').classList.contains('active');
+        if (!vaultOpen) {
+          document.body.style.overflow = '';
+        }
+        isLightboxClosing = false;
+      }, 360);
     }
 
-    // ─── 6. FULL-SCREEN MEDIA VAULT MODAL ───
+    // ─── 6. FULL-SCREEN MEDIA VAULT MODAL (iOS GLASSMORPHIC DEPTH REVEAL) ───
     var vaultModal = document.getElementById('portfolioVaultModal');
+    var vaultContainer = document.getElementById('vaultContainer');
+    var isVaultClosing = false;
+    var isVaultOpening = false;
     var vaultFilterAnimTimeout = null;
 
     function openVaultModal(defaultFilter) {
       if (!vaultModal) vaultModal = document.getElementById('portfolioVaultModal');
+      if (!vaultContainer) vaultContainer = document.getElementById('vaultContainer');
+
+      isVaultClosing = false;
+      isVaultOpening = true;
+
+      vaultModal.style.display = 'flex';
       vaultModal.classList.add('active');
+      vaultModal.style.transition = 'none';
+      vaultModal.style.opacity = '0';
+
+      if (vaultContainer) {
+        vaultContainer.style.transition = 'none';
+        vaultContainer.style.transform = 'scale(0.94) translateY(24px)';
+        vaultContainer.style.opacity = '0';
+      }
+
       document.body.style.overflow = 'hidden';
+
       var targetFilter = defaultFilter || 'all';
       filterVault(targetFilter);
+
+      void vaultModal.offsetWidth;
+
       requestAnimationFrame(function () {
+        vaultModal.style.transition = 'opacity 0.35s ease';
+        vaultModal.style.opacity = '1';
+
+        if (vaultContainer) {
+          vaultContainer.style.transition = 'transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.44s cubic-bezier(0.22, 1, 0.36, 1)';
+          vaultContainer.style.transform = 'scale(1) translateY(0)';
+          vaultContainer.style.opacity = '1';
+        }
+
         var activeBtn = document.querySelector('.vault-tab-btn[data-filter="' + targetFilter + '"]') || document.querySelector('.vault-tab-btn.active');
         moveSlidingPill(document.querySelector('.vault-filter-tabs'), document.getElementById('vaultSlidingPill'), activeBtn, false);
+
+        setTimeout(function () {
+          if (isVaultOpening && !isVaultClosing && vaultContainer) {
+            vaultContainer.style.transform = '';
+            isVaultOpening = false;
+          }
+        }, 460);
       });
     }
 
     function closeVaultModal() {
       if (!vaultModal) vaultModal = document.getElementById('portfolioVaultModal');
-      vaultModal.classList.remove('active');
-      document.body.style.overflow = '';
+      if (!vaultContainer) vaultContainer = document.getElementById('vaultContainer');
+      if (isVaultClosing) return;
+      isVaultClosing = true;
+      isVaultOpening = false;
+
+      // Reverse smoothly: scale(0.95) translateY(18px); opacity: 0; duration: 0.3s
+      vaultModal.style.transition = 'opacity 0.3s ease';
+      vaultModal.style.opacity = '0';
+
+      if (vaultContainer) {
+        vaultContainer.style.transition = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease';
+        vaultContainer.style.transform = 'scale(0.95) translateY(18px)';
+        vaultContainer.style.opacity = '0';
+      }
+
       if (window.pauseAllAdoraVideos) {
         window.pauseAllAdoraVideos();
       }
+
+      setTimeout(function () {
+        vaultModal.style.display = 'none';
+        vaultModal.classList.remove('active');
+        vaultModal.style.transition = '';
+        vaultModal.style.opacity = '';
+        if (vaultContainer) {
+          vaultContainer.style.transition = '';
+          vaultContainer.style.transform = '';
+          vaultContainer.style.opacity = '';
+        }
+        document.body.style.overflow = '';
+        isVaultClosing = false;
+      }, 300);
     }
 
     function filterVault(category) {
@@ -6396,8 +6625,14 @@
 
     window.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') {
-        closeLightbox();
-        closeVaultModal();
+        if (lightbox && lightbox.classList.contains('active')) {
+          closeLightbox();
+          return;
+        }
+        if (vaultModal && vaultModal.classList.contains('active')) {
+          closeVaultModal();
+          return;
+        }
         closeDrawer();
         closeLegalModal();
       }
