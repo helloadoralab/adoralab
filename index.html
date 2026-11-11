@@ -168,22 +168,45 @@
     }
 
     .pill-nav-links {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 6px;
       list-style: none;
     }
 
+    .nav-sliding-pill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: linear-gradient(135deg, rgba(30, 111, 255, 0.88), rgba(0, 81, 255, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      box-shadow: 0 4px 18px rgba(30, 111, 255, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      will-change: transform, width, height;
+      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.25s ease;
+      opacity: 0;
+    }
+
     .nav-pill-item {
+      position: relative;
+      z-index: 1;
       color: rgba(255, 255, 255, 0.72);
       font-size: 13.5px;
       font-weight: 600;
       text-decoration: none;
       padding: 7px 15px;
       border-radius: 9999px;
-      transition: all 0.22s ease;
+      transition: color 0.25s ease, transform 0.15s ease;
       letter-spacing: 0.01em;
       border: 1px solid transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .nav-pill-item:hover {
@@ -192,11 +215,15 @@
       border-color: rgba(255, 255, 255, 0.12);
     }
 
+    .nav-pill-item:active {
+      transform: scale(0.95);
+    }
+
     .nav-pill-item.active-pill {
       color: #ffffff;
-      background: rgba(255, 255, 255, 0.14);
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      background: transparent;
+      border: 1px solid transparent;
+      box-shadow: none;
     }
 
     .pill-menu-btn {
@@ -2639,6 +2666,7 @@
     }
 
     .legal-tabs-bar {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -2649,30 +2677,53 @@
       overflow-x: auto;
     }
 
+    .legal-sliding-pill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: linear-gradient(135deg, #1E6FFF, #0051FF);
+      border-radius: 999px;
+      box-shadow: 0 4px 18px rgba(30, 111, 255, 0.45);
+      will-change: transform, width, height;
+      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.25s ease;
+      opacity: 0;
+    }
+
     .legal-tab-btn {
+      position: relative;
+      z-index: 1;
       padding: 6px 14px;
       border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: transparent;
+      border: 1px solid transparent;
       color: rgba(255, 255, 255, 0.7);
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: color 0.25s ease, transform 0.15s ease;
       white-space: nowrap;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .legal-tab-btn:hover {
       color: #ffffff;
-      border-color: rgba(56, 189, 248, 0.5);
-      background: rgba(30, 111, 255, 0.15);
+    }
+
+    .legal-tab-btn:active {
+      transform: scale(0.95);
     }
 
     .legal-tab-btn.active {
-      background: #1E6FFF;
+      background: transparent;
       color: #ffffff;
-      border-color: #38bdf8;
-      box-shadow: 0 0 14px rgba(30, 111, 255, 0.6);
+      border-color: transparent;
+      box-shadow: none;
     }
 
     .legal-modal-body {
@@ -2899,6 +2950,7 @@
     }
 
     .vault-filter-tabs {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -2906,9 +2958,36 @@
       padding: 4px;
       border-radius: 9999px;
       border: 1px solid rgba(120, 180, 255, 0.2);
+      overflow-x: auto;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .vault-filter-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .vault-sliding-pill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+      background: linear-gradient(135deg, #1E6FFF, #0051FF);
+      border-radius: 999px;
+      box-shadow: 0 4px 18px rgba(30, 111, 255, 0.45);
+      will-change: transform, width, height;
+      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.25s ease;
+      opacity: 0;
     }
 
     .vault-tab-btn {
+      position: relative;
+      z-index: 1;
       padding: 7px 18px;
       border-radius: 9999px;
       background: transparent;
@@ -2917,18 +2996,24 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: color 0.25s ease, transform 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .vault-tab-btn:hover {
       color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .vault-tab-btn:active {
+      transform: scale(0.95);
     }
 
     .vault-tab-btn.active {
       color: #ffffff;
-      background: #1e6fff;
-      box-shadow: 0 0 18px rgba(30, 111, 255, 0.7);
+      background: transparent;
+      box-shadow: none;
     }
 
     .vault-close-btn {
@@ -2971,10 +3056,34 @@
       background: rgba(10, 16, 36, 0.8);
       border: 1.5px solid rgba(120, 180, 255, 0.25);
       box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6);
-      transition: all 0.3s ease;
       position: relative;
       display: flex;
       flex-direction: column;
+      will-change: transform, opacity;
+      transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  border-color 0.25s ease,
+                  box-shadow 0.25s ease;
+    }
+
+    .vault-card.vault-card-leaving {
+      opacity: 0 !important;
+      transform: scale(0.94) translateY(8px) !important;
+      transition: opacity 0.16s ease, transform 0.16s ease !important;
+      pointer-events: none;
+    }
+
+    .vault-card.vault-card-entering {
+      opacity: 0 !important;
+      transform: scale(0.95) translateY(14px) !important;
+      transition: none !important;
+    }
+
+    .vault-card.vault-card-entered {
+      opacity: 1 !important;
+      transform: scale(1) translateY(0) !important;
+      transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) !important;
     }
 
     .vault-card:hover {
@@ -3698,10 +3807,13 @@
         align-items: flex-start;
         gap: 12px;
       }
+      .vault-filter-tabs,
       .vault-filter-pills {
         overflow-x: auto;
         width: 100%;
+        max-width: 100%;
         padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
       }
       .vault-grid {
         grid-template-columns: 1fr;
@@ -3737,6 +3849,7 @@
       <!-- Center: Navigation Links -->
       <nav>
         <ul class="pill-nav-links">
+          <li class="nav-sliding-pill" id="navSlidingPill" aria-hidden="true"></li>
           <li><a href="#portfolio" class="nav-pill-item active-pill">Portfolio</a></li>
           <li><a href="#showcase" class="nav-pill-item">Services</a></li>
           <li><a href="#pricing" class="nav-pill-item">Pricing</a></li>
@@ -4812,6 +4925,7 @@
       </div>
 
       <div class="vault-filter-tabs">
+        <div class="vault-sliding-pill" id="vaultSlidingPill" aria-hidden="true"></div>
         <button class="vault-tab-btn active" data-filter="all" onclick="filterVault('all')">All (14)</button>
         <button class="vault-tab-btn" data-filter="posters" onclick="filterVault('posters')">Posters (8)</button>
         <button class="vault-tab-btn" data-filter="cinematic" onclick="filterVault('cinematic')">Cinematic Ads (3)</button>
@@ -5091,6 +5205,7 @@
 
       <!-- Navigation Tabs Bar -->
       <div class="legal-tabs-bar">
+        <div class="legal-sliding-pill" id="legalSlidingPill" aria-hidden="true"></div>
         <button type="button" class="legal-tab-btn active" id="tab-all" onclick="setLegalTab('all')">All Policies</button>
         <button type="button" class="legal-tab-btn" id="tab-privacy" onclick="setLegalTab('privacy')">Privacy Policy</button>
         <button type="button" class="legal-tab-btn" id="tab-terms" onclick="setLegalTab('terms')">Terms &amp; Refund Policy</button>
@@ -5211,8 +5326,36 @@
       'https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png'
     ];
 
+    // ─── LIQUID MORPH SLIDING PILL ENGINE (HARDWARE-ACCELERATED) ───
+    function moveSlidingPill(container, pill, targetBtn, animate) {
+      if (!container || !pill || !targetBtn) return;
+      if (targetBtn.offsetWidth === 0 && targetBtn.offsetHeight === 0) return;
+
+      var cRect = container.getBoundingClientRect();
+      var bRect = targetBtn.getBoundingClientRect();
+      var x = bRect.left - cRect.left + container.scrollLeft;
+      var y = bRect.top - cRect.top + container.scrollTop;
+      var w = bRect.width;
+      var h = bRect.height;
+
+      if (animate === false) {
+        pill.style.transition = 'none';
+      }
+      pill.style.width = w + 'px';
+      pill.style.height = h + 'px';
+      pill.style.transform = 'translate3d(' + Math.round(x) + 'px, ' + Math.round(y) + 'px, 0)';
+      pill.style.opacity = '1';
+
+      if (animate === false) {
+        void pill.offsetWidth;
+        pill.style.transition = '';
+      }
+    }
+
     // ─── NAVBAR ACTIVE PILL SCROLLSPY & UNIFIED TOP ANCHOR ───
     (function initNavScrollspy() {
+      var navContainer = document.querySelector('.pill-nav-links');
+      var navPill = document.getElementById('navSlidingPill');
       var navLinks = document.querySelectorAll('.pill-nav-links .nav-pill-item');
       if (!navLinks || !navLinks.length) return;
 
@@ -5225,14 +5368,38 @@
         { id: 'contact', link: document.querySelector('.pill-nav-links a[href="#contact"]') }
       ];
 
-      function setActivePill(targetLink) {
+      function setActivePill(targetLink, animate) {
+        if (animate === undefined) animate = true;
         navLinks.forEach(function (l) { l.classList.remove('active-pill'); });
-        if (targetLink) targetLink.classList.add('active-pill');
+        if (targetLink) {
+          targetLink.classList.add('active-pill');
+          moveSlidingPill(navContainer, navPill, targetLink, animate);
+        }
       }
+
+      function updateActivePillPos(animate) {
+        var activeLink = document.querySelector('.pill-nav-links .active-pill') || sections[0].link;
+        if (activeLink) setActivePill(activeLink, animate);
+      }
+
+      if (document.readyState === 'complete') {
+        updateActivePillPos(false);
+      } else {
+        window.addEventListener('load', function () { updateActivePillPos(false); });
+        setTimeout(function () { updateActivePillPos(false); }, 80);
+      }
+
+      window.addEventListener('resize', function () {
+        updateActivePillPos(false);
+        var activeVaultBtn = document.querySelector('.vault-tab-btn.active');
+        if (activeVaultBtn) moveSlidingPill(document.querySelector('.vault-filter-tabs'), document.getElementById('vaultSlidingPill'), activeVaultBtn, false);
+        var activeLegalBtn = document.querySelector('.legal-tab-btn.active');
+        if (activeLegalBtn) moveSlidingPill(document.querySelector('.legal-tabs-bar'), document.getElementById('legalSlidingPill'), activeLegalBtn, false);
+      });
 
       navLinks.forEach(function (link) {
         link.addEventListener('click', function () {
-          setActivePill(link);
+          setActivePill(link, true);
         });
       });
 
@@ -5243,7 +5410,7 @@
           scrollTimer = null;
           var scrollY = window.pageYOffset || document.documentElement.scrollTop;
           if (scrollY < 220) {
-            setActivePill(sections[0].link);
+            setActivePill(sections[0].link, true);
             return;
           }
           var current = sections[0].link;
@@ -5256,7 +5423,7 @@
               }
             }
           }
-          if (current) setActivePill(current);
+          if (current) setActivePill(current, true);
         }, 50);
       }, { passive: true });
     })();
@@ -5938,16 +6105,22 @@
 
     // ─── 6. FULL-SCREEN MEDIA VAULT MODAL ───
     var vaultModal = document.getElementById('portfolioVaultModal');
+    var vaultFilterAnimTimeout = null;
 
     function openVaultModal(defaultFilter) {
+      if (!vaultModal) vaultModal = document.getElementById('portfolioVaultModal');
       vaultModal.classList.add('active');
       document.body.style.overflow = 'hidden';
-      if (defaultFilter) {
-        filterVault(defaultFilter);
-      }
+      var targetFilter = defaultFilter || 'all';
+      filterVault(targetFilter);
+      requestAnimationFrame(function () {
+        var activeBtn = document.querySelector('.vault-tab-btn[data-filter="' + targetFilter + '"]') || document.querySelector('.vault-tab-btn.active');
+        moveSlidingPill(document.querySelector('.vault-filter-tabs'), document.getElementById('vaultSlidingPill'), activeBtn, false);
+      });
     }
 
     function closeVaultModal() {
+      if (!vaultModal) vaultModal = document.getElementById('portfolioVaultModal');
       vaultModal.classList.remove('active');
       document.body.style.overflow = '';
       if (window.pauseAllAdoraVideos) {
@@ -5956,23 +6129,92 @@
     }
 
     function filterVault(category) {
+      var container = document.querySelector('.vault-filter-tabs');
+      var pill = document.getElementById('vaultSlidingPill');
       var tabBtns = document.querySelectorAll('.vault-tab-btn');
+      var activeBtn = null;
+
       tabBtns.forEach(function (btn) {
         if (btn.getAttribute('data-filter') === category) {
           btn.classList.add('active');
+          activeBtn = btn;
         } else {
           btn.classList.remove('active');
         }
       });
 
-      var cards = document.querySelectorAll('.vault-card');
-      cards.forEach(function (card) {
-        if (category === 'all' || card.getAttribute('data-category') === category) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+      if (activeBtn) {
+        moveSlidingPill(container, pill, activeBtn, true);
+      }
+
+      var cards = Array.from(document.querySelectorAll('.vault-card'));
+      if (vaultFilterAnimTimeout) {
+        clearTimeout(vaultFilterAnimTimeout);
+        vaultFilterAnimTimeout = null;
+      }
+
+      function executeCardSwitch() {
+        var outgoing = [];
+        var incoming = [];
+
+        cards.forEach(function (card) {
+          var matches = (category === 'all' || card.getAttribute('data-category') === category);
+          var isCurrentlyVisible = (card.style.display !== 'none');
+
+          if (matches) {
+            incoming.push(card);
+          } else if (isCurrentlyVisible) {
+            outgoing.push(card);
+          }
+        });
+
+        // Step A: Animate outgoing cards out softly
+        outgoing.forEach(function (card) {
+          card.classList.remove('vault-card-entering', 'vault-card-entered');
+          card.classList.add('vault-card-leaving');
+        });
+
+        var switchDelay = outgoing.length > 0 ? 160 : 0;
+        vaultFilterAnimTimeout = setTimeout(function () {
+          outgoing.forEach(function (card) {
+            card.style.display = 'none';
+            card.classList.remove('vault-card-leaving');
+          });
+
+          incoming.forEach(function (card, index) {
+            card.style.display = 'flex';
+            card.classList.remove('vault-card-leaving', 'vault-card-entered');
+            card.classList.add('vault-card-entering');
+            card.style.transitionDelay = (index * 35) + 'ms';
+          });
+
+          // Trigger reflow
+          if (incoming.length > 0) {
+            void incoming[0].offsetWidth;
+          }
+
+          requestAnimationFrame(function () {
+            incoming.forEach(function (card) {
+              card.classList.remove('vault-card-entering');
+              card.classList.add('vault-card-entered');
+            });
+          });
+
+          vaultFilterAnimTimeout = setTimeout(function () {
+            incoming.forEach(function (card) {
+              card.style.transitionDelay = '';
+            });
+          }, 400 + (incoming.length * 35));
+        }, switchDelay);
+      }
+
+      if (typeof document.startViewTransition === 'function' && window.matchMedia && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.startViewTransition(function () {
+          executeCardSwitch();
+        });
+      } else {
+        executeCardSwitch();
+      }
     }
 
     window.addEventListener('keydown', function (e) {
@@ -5996,7 +6238,12 @@
       legalModal.classList.add('active');
       document.body.style.overflow = 'hidden';
 
-      setLegalTab(tab || 'all');
+      var targetTab = tab || 'all';
+      setLegalTab(targetTab);
+      requestAnimationFrame(function () {
+        var activeBtn = document.getElementById('tab-' + targetTab) || document.querySelector('.legal-tab-btn.active');
+        moveSlidingPill(document.querySelector('.legal-tabs-bar'), document.getElementById('legalSlidingPill'), activeBtn, false);
+      });
     }
 
     function closeLegalModal() {
@@ -6017,13 +6264,19 @@
 
     function setLegalTab(tab) {
       var tabBtns = document.querySelectorAll('.legal-tab-btn');
+      var activeBtn = null;
       tabBtns.forEach(function (btn) {
         if (btn.id === 'tab-' + tab) {
           btn.classList.add('active');
+          activeBtn = btn;
         } else {
           btn.classList.remove('active');
         }
       });
+
+      if (activeBtn) {
+        moveSlidingPill(document.querySelector('.legal-tabs-bar'), document.getElementById('legalSlidingPill'), activeBtn, true);
+      }
 
       var sections = document.querySelectorAll('.legal-section');
       sections.forEach(function (sec) {
