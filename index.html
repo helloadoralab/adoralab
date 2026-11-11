@@ -33,11 +33,15 @@
       --text-dim: rgba(255, 255, 255, 0.55);
     }
 
+    html,
+    body {
+      scroll-behavior: auto !important;
+    }
+
     html {
       background: var(--bg);
       color: var(--text-white);
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      scroll-behavior: smooth;
     }
 
     body {
@@ -222,11 +226,15 @@
       transform: scale(0.95);
     }
 
+    .nav-pill-item:focus,
+    .nav-pill-item:focus-visible,
+    .nav-pill-item.active,
     .nav-pill-item.active-pill {
       color: #ffffff;
       background: transparent !important;
       border: 1px solid transparent !important;
       box-shadow: none !important;
+      outline: none !important;
     }
 
     .pill-menu-btn {
@@ -4871,7 +4879,7 @@
       <div class="footer-container">
         
         <!-- Left: ADORA LAB logo + brand name -->
-        <a href="#portfolio" class="footer-brand" onclick="event.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); history.replaceState(null, '', '#portfolio');" title="Adora Lab — Scroll to Top">
+        <a href="#portfolio" class="footer-brand" onclick="event.preventDefault(); window.navScrollToSection ? window.navScrollToSection('portfolio') : window.scrollTo(0, 0); history.replaceState(null, '', '#portfolio');" title="Adora Lab — Scroll to Top">
           <div class="footer-logo-box">
             <img src="/images/adora-lab-logo.jpg" alt="Adora Lab" class="footer-logo-img" />
           </div>
@@ -5384,6 +5392,7 @@
 
     // ─── CUSTOM BUTTER-SMOOTH iOS PAGE SCROLL (ZERO-LAG 650ms RAF) ───
     var isNavClickScrolling = false;
+    var targetSectionId = null;
     var navClickUnlockTimer = null;
     var navScrollAnimId = null;
 
@@ -5443,6 +5452,14 @@
       ];
 
       function setActivePill(targetLink, animate) {
+        // Position-verified lock: If locked, reject any updates that don't match targetSectionId
+        if (isNavClickScrolling && targetSectionId) {
+          var href = targetLink ? targetLink.getAttribute('href') : '';
+          var id = href ? href.replace(/^#/, '') : '';
+          if (id !== targetSectionId) {
+            return;
+          }
+        }
         if (animate === undefined) animate = true;
         navLinks.forEach(function (l) { l.classList.remove('active-pill'); });
         if (targetLink) {
@@ -5457,60 +5474,75 @@
       }
 
       window.navScrollToSection = function (targetId) {
-        var targetLink = document.querySelector('.pill-nav-links a[href="#' + targetId + '"]');
-        if (!targetLink && targetId === 'hero') {
+        var cleanId = targetId ? targetId.replace(/^#/, '') : 'portfolio';
+        if (cleanId === 'hero') cleanId = 'portfolio';
+
+        var targetLink = document.querySelector('.pill-nav-links a[href="#' + cleanId + '"]');
+        if (!targetLink && cleanId === 'portfolio') {
           targetLink = sections[0].link;
         }
-        var targetEl = document.getElementById(targetId);
+        var targetEl = document.getElementById(cleanId);
 
-        // a) Set isNavClickScrolling = true to temporarily pause/ignore the scroll-spy listener
+        // a) Set isNavClickScrolling = true and targetSectionId = clickedId
         isNavClickScrolling = true;
-        if (navClickUnlockTimer) clearTimeout(navClickUnlockTimer);
-
-        // b) Immediately glide the floating blue pill DIRECTLY to the clicked target tab in one single continuous motion
-        if (targetLink) {
-          setActivePill(targetLink, true);
+        targetSectionId = cleanId;
+        if (navClickUnlockTimer) {
+          clearTimeout(navClickUnlockTimer);
+          navClickUnlockTimer = null;
         }
 
-        // Calculate target scroll offset
+        // b) Immediately move the .nav-ios-pill to the clicked nav link AND keep it locked strictly to targetSectionId
+        if (targetLink) {
+          navLinks.forEach(function (l) { l.classList.remove('active-pill'); });
+          targetLink.classList.add('active-pill');
+          moveSlidingPill(navContainer, navPill, targetLink, true);
+        }
+
+        // Calculate target scroll offset with clamping
         var targetY = 0;
-        if (targetId && targetId !== 'portfolio' && targetId !== 'hero' && targetEl) {
+        if (cleanId !== 'portfolio' && cleanId !== 'hero' && targetEl) {
           var navbar = document.querySelector('.pill-navbar') || document.querySelector('.nav-pill-wrapper');
           var navHeight = navbar ? navbar.offsetHeight + 16 : 80;
           var rect = targetEl.getBoundingClientRect();
           var currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
           targetY = Math.max(0, rect.top + currentScrollY - navHeight);
+          var maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+          targetY = Math.min(targetY, maxScrollY);
         }
 
         if (history.pushState) {
-          history.pushState(null, '', '#' + targetId);
+          history.pushState(null, '', '#' + cleanId);
         }
 
-        // c) Custom butter-smooth page scroll (650ms duration) and unlock afterwards
+        // d) Do NOT unlock isNavClickScrolling with a short fixed timer.
+        // Only set isNavClickScrolling = false AFTER the custom requestAnimationFrame
+        // scroll animation loop has 100% completed its final frame PLUS an extra 150ms buffer.
         smoothScrollTo(targetY, 650, function () {
           if (navClickUnlockTimer) clearTimeout(navClickUnlockTimer);
           navClickUnlockTimer = setTimeout(function () {
             isNavClickScrolling = false;
-          }, 100);
+            targetSectionId = null;
+          }, 150);
         });
-
-        navClickUnlockTimer = setTimeout(function () {
-          isNavClickScrolling = false;
-        }, 850);
       };
 
-      // Yield programmatic scroll gracefully if user manually touches or scrolls
+      // e) If the user manually wheels or touches the screen (wheel or touchstart event), immediately release isNavClickScrolling = false
       function abortNavScroll() {
         if (isNavClickScrolling) {
           if (navScrollAnimId) {
             cancelAnimationFrame(navScrollAnimId);
             navScrollAnimId = null;
           }
-          if (navClickUnlockTimer) clearTimeout(navClickUnlockTimer);
+          if (navClickUnlockTimer) {
+            clearTimeout(navClickUnlockTimer);
+            navClickUnlockTimer = null;
+          }
           isNavClickScrolling = false;
+          targetSectionId = null;
         }
       }
       window.addEventListener('wheel', abortNavScroll, { passive: true });
+      window.addEventListener('touchstart', abortNavScroll, { passive: true });
       window.addEventListener('touchmove', abortNavScroll, { passive: true });
 
       if (document.readyState === 'complete') {
@@ -5539,7 +5571,7 @@
 
       var scrollTimer = null;
       window.addEventListener('scroll', function () {
-        // PAUSE/IGNORE scroll-spy while programmatic nav click scrolling is active
+        // c) Inside the scroll-spy / window.onscroll handler, completely IGNORE all updates while isNavClickScrolling === true
         if (isNavClickScrolling) return;
 
         if (scrollTimer) return;
@@ -5923,8 +5955,10 @@
       syncOrderToForm();
 
       var contactEl = document.getElementById('contact');
-      if (contactEl) {
-        contactEl.scrollIntoView({ behavior: 'smooth' });
+      if (window.navScrollToSection) {
+        window.navScrollToSection('contact');
+      } else if (contactEl) {
+        contactEl.scrollIntoView({ behavior: 'auto' });
       }
 
       var pill = document.getElementById('lockedPlanPill');
