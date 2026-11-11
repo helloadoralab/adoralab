@@ -23,7 +23,7 @@ const SERVICES = [
     num: "03",
     title: "Cinematic Ads",
     desc: "TV-grade story ads with cinematic camera moves, custom scores, and sound design that make a small brand feel massive.",
-    tags: ["15–60s story arcs", "Music + SFX included", "4K mastering"],
+    tags: ["15–60s story arcs", "Music + SFX included", "Full HD (1080p) mastering"],
   },
 ];
 

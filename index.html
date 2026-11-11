@@ -3834,8 +3834,8 @@
           <h2 class="card-plan-name">Adora Family Starter</h2>
           <p class="card-plan-desc">A taste of Adora for the inner circle.</p>
 
-          <!-- Sub-Tier 1: UGC Essentials ($99) - Default Active -->
-          <div class="sub-plan active-tier" 
+          <!-- Sub-Tier 1: UGC Essentials ($99) -->
+          <div class="sub-plan" 
                onclick="selectSubTier('starter', 'UGC Essentials', '$99', '2 AI Photos + 2 UGC Videos')"
                data-tier="ugc">
             <div class="sub-plan-header-row">
@@ -3938,8 +3938,8 @@
             </ul>
           </div>
 
-          <!-- Sub-Tier 2: Cinematic Suite ($199) - Default Active -->
-          <div class="sub-plan active-tier" 
+          <!-- Sub-Tier 2: Cinematic Suite ($199) -->
+          <div class="sub-plan" 
                onclick="selectSubTier('booster', 'Cinematic Suite', '$199', '4 AI Photos + 4 Cinematic Videos')"
                data-tier="cinematic">
             <div class="sub-plan-header-row">
@@ -4014,8 +4014,8 @@
             </ul>
           </div>
 
-          <!-- Sub-Tier 2: Cinematic Flagship ($299) - Default Active -->
-          <div class="sub-plan active-tier" 
+          <!-- Sub-Tier 2: Cinematic Flagship ($299) -->
+          <div class="sub-plan" 
                onclick="selectSubTier('scale', 'Cinematic Flagship', '$299', '8 AI Photos + 8 Cinematic Videos')"
                data-tier="cinematic">
             <div class="sub-plan-header-row">
@@ -4091,7 +4091,7 @@
             </svg>
           </div>
           <h3 class="why-card-title">Zero Shipping Hassle — Fully Digital Workflow</h3>
-          <p class="why-card-desc">Receive 4K Commercials &amp; Visuals Digitally anywhere with zero studio fees. Send us clean photos of your product, and we deliver studio-grade visuals digitally in 3–4 days.</p>
+          <p class="why-card-desc">Receive Full HD (1080p) Commercials &amp; Visuals Digitally anywhere with zero studio fees. Send us clean photos of your product, and we deliver studio-grade visuals digitally in 3–4 days.</p>
         </div>
 
         <!-- Card 2 — 100% Label & Character Lock -->
@@ -4146,14 +4146,14 @@
       </div>
 
       <div class="faq-container">
-        <!-- FAQ 1 (Open by default) -->
-        <div class="faq-item active" id="faq-item-1">
-          <button type="button" class="faq-question-btn" onclick="toggleFaq(1)" aria-expanded="true">
+        <!-- FAQ 1 -->
+        <div class="faq-item" id="faq-item-1">
+          <button type="button" class="faq-question-btn" onclick="toggleFaq(1)" aria-expanded="false">
             <span>Do I need to ship my physical product, and will my label stay accurate?</span>
-            <span class="faq-toggle-icon" id="faq-icon-1">&minus;</span>
+            <span class="faq-toggle-icon" id="faq-icon-1">&#43;</span>
           </button>
           <div class="faq-answer-wrap">
-            <p class="faq-answer-text">Zero Shipping Hassle — Fully Digital Workflow. Simply share clean photos of your product from a few angles, and receive 4K Commercials &amp; Visuals Digitally anywhere. Our workflow locks in 100% Product &amp; Character Consistency, ensuring your exact brand logo, label typography, and packaging stay sharp and distortion-free.</p>
+            <p class="faq-answer-text">Zero Shipping Hassle — Fully Digital Workflow. Simply share clean photos of your product from a few angles, and receive Full HD (1080p) Commercials &amp; Visuals Digitally anywhere. Our workflow locks in 100% Product &amp; Character Consistency, ensuring your exact brand logo, label typography, and packaging stay sharp and distortion-free.</p>
           </div>
         </div>
 
@@ -4175,7 +4175,7 @@
             <span class="faq-toggle-icon" id="faq-icon-3">&#43;</span>
           </button>
           <div class="faq-answer-wrap">
-            <p class="faq-answer-text">Both formats are available at no extra cost. Whether you need 9:16 Vertical (for Instagram Reels, TikTok, and YouTube Shorts) or 16:9 Horizontal / Widescreen (for website heroes, YouTube ads, and TV-style commercials), we deliver ready-to-launch 4K files.</p>
+            <p class="faq-answer-text">Both formats are available at no extra cost. Whether you need 9:16 Vertical (for Instagram Reels, TikTok, and YouTube Shorts) or 16:9 Horizontal / Widescreen (for website heroes, YouTube ads, and TV-style commercials), we deliver ready-to-launch Full HD (1080p) files.</p>
           </div>
         </div>
 
@@ -4244,7 +4244,7 @@
           <div class="locked-plan-pill" id="lockedPlanPill">
             <div class="locked-plan-content">
               <span class="locked-check-icon">&#10003;</span>
-              <span id="lockedPlanText">Selected: Monthly Brand Booster — Cinematic Suite ($199/pack | 4 Photos + 4 Videos)</span>
+              <span id="lockedPlanText">Select a plan from above or choose below</span>
             </div>
           </div>
 
@@ -4275,10 +4275,11 @@
             <div class="form-group">
               <label class="form-label" for="planSelector">Selected Plan &amp; Value</label>
               <select id="planSelector" class="dark-glass-select" onchange="onManualPlanChange(this.value)">
+                <option value="" disabled selected>Select a plan track &amp; package...</option>
                 <option value="starter_ugc">Adora Family Starter — UGC Essentials ($99/pack | 2 Photos + 2 Videos)</option>
                 <option value="starter_cinematic">Adora Family Starter — Cinematic Suite ($149/pack | 2 Photos + 2 Videos)</option>
                 <option value="booster_ugc">Monthly Brand Booster — UGC Essentials ($149/pack | 4 Photos + 4 Videos)</option>
-                <option value="booster_cinematic" selected>Monthly Brand Booster — Cinematic Suite ($199/pack | 4 Photos + 4 Videos)</option>
+                <option value="booster_cinematic">Monthly Brand Booster — Cinematic Suite ($199/pack | 4 Photos + 4 Videos)</option>
                 <option value="scale_ugc">Brand Scale Domination — UGC Essentials ($199/pack | 8 Photos + 8 Videos)</option>
                 <option value="scale_cinematic">Brand Scale Domination — Cinematic Flagship ($299/pack | 8 Photos + 8 Videos)</option>
               </select>
@@ -4719,15 +4720,14 @@
       }
     };
 
-    var currentSelectedOrder = {
-      package: 'Monthly Brand Booster',
-      track: 'Cinematic Suite',
-      price: '$199',
-      deliverables: '4 AI Photos + 4 Cinematic Videos',
-      dropdownVal: 'booster_cinematic'
-    };
+    var currentSelectedOrder = null;
 
     function selectSubTier(cardKey, track, price, deliverables) {
+      // Remove active-tier from ALL cards to ensure only the explicitly chosen plan is active
+      document.querySelectorAll('.sub-plan').forEach(function (sp) {
+        sp.classList.remove('active-tier');
+      });
+
       var cardEl = document.getElementById('card-' + cardKey);
       if (!cardEl) return;
 
@@ -4736,19 +4736,20 @@
         var label = sp.querySelector('.sub-plan-label');
         if (label && label.textContent.trim().toLowerCase() === track.toLowerCase()) {
           sp.classList.add('active-tier');
-        } else {
-          sp.classList.remove('active-tier');
         }
       });
 
       var dropdownKey = cardKey + '_' + (track.toLowerCase().indexOf('ugc') !== -1 ? 'ugc' : 'cinematic');
-      planState[cardKey] = {
+      var chosenPlan = {
         package: cardEl.querySelector('.card-plan-name').textContent.trim(),
         track: track,
         price: price,
         deliverables: deliverables,
         dropdownVal: dropdownKey
       };
+      planState[cardKey] = chosenPlan;
+      currentSelectedOrder = chosenPlan;
+      syncOrderToForm();
 
       var btn = document.getElementById('btn-' + cardKey);
       if (btn) {
@@ -4759,6 +4760,18 @@
     // ─── 2. 'GET STARTED' BUTTON SMOOTH REDIRECT & AUTO-FILL ───
     function triggerGetStarted(cardKey) {
       var chosen = planState[cardKey];
+      if (!chosen) {
+        var cardEl = document.getElementById('card-' + cardKey);
+        if (cardEl) {
+          var firstSub = cardEl.querySelector('.sub-plan');
+          if (firstSub) {
+            firstSub.click();
+            chosen = planState[cardKey];
+          }
+        }
+      } else {
+        selectSubTier(cardKey, chosen.track, chosen.price, chosen.deliverables);
+      }
       if (!chosen) return;
 
       currentSelectedOrder = Object.assign({}, chosen);
@@ -4783,28 +4796,34 @@
     function syncOrderToForm() {
       var pillText = document.getElementById('lockedPlanText');
       if (pillText) {
-        pillText.textContent = 'Selected: ' + currentSelectedOrder.package + ' — ' + currentSelectedOrder.track + ' (' + currentSelectedOrder.price + '/pack | ' + currentSelectedOrder.deliverables + ')';
+        if (currentSelectedOrder && currentSelectedOrder.package) {
+          pillText.textContent = 'Selected: ' + currentSelectedOrder.package + ' — ' + currentSelectedOrder.track + ' (' + currentSelectedOrder.price + '/pack | ' + currentSelectedOrder.deliverables + ')';
+        } else {
+          pillText.textContent = 'Select a plan from above or choose below';
+        }
       }
 
       var selector = document.getElementById('planSelector');
-      if (selector && currentSelectedOrder.dropdownVal) {
-        selector.value = currentSelectedOrder.dropdownVal;
+      if (selector) {
+        if (currentSelectedOrder && currentSelectedOrder.dropdownVal) {
+          selector.value = currentSelectedOrder.dropdownVal;
+        }
       }
     }
 
     function onManualPlanChange(val) {
       var planMap = {
-        'starter_ugc': { package: 'Adora Family Starter', track: 'UGC Essentials', price: '$99', deliverables: '2 AI Photos + 2 UGC Videos' },
-        'starter_cinematic': { package: 'Adora Family Starter', track: 'Cinematic Suite', price: '$149', deliverables: '2 AI Photos + 2 Cinematic Videos' },
-        'booster_ugc': { package: 'Monthly Brand Booster', track: 'UGC Essentials', price: '$149', deliverables: '4 AI Photos + 4 UGC Videos' },
-        'booster_cinematic': { package: 'Monthly Brand Booster', track: 'Cinematic Suite', price: '$199', deliverables: '4 AI Photos + 4 Cinematic Videos' },
-        'scale_ugc': { package: 'Brand Scale Domination', track: 'UGC Essentials', price: '$199', deliverables: '8 AI Photos + 8 UGC Videos' },
-        'scale_cinematic': { package: 'Brand Scale Domination', track: 'Cinematic Flagship', price: '$299', deliverables: '8 AI Photos + 8 Cinematic Videos' }
+        'starter_ugc': { cardKey: 'starter', package: 'Adora Family Starter', track: 'UGC Essentials', price: '$99', deliverables: '2 AI Photos + 2 UGC Videos' },
+        'starter_cinematic': { cardKey: 'starter', package: 'Adora Family Starter', track: 'Cinematic Suite', price: '$149', deliverables: '2 AI Photos + 2 Cinematic Videos' },
+        'booster_ugc': { cardKey: 'booster', package: 'Monthly Brand Booster', track: 'UGC Essentials', price: '$149', deliverables: '4 AI Photos + 4 UGC Videos' },
+        'booster_cinematic': { cardKey: 'booster', package: 'Monthly Brand Booster', track: 'Cinematic Suite', price: '$199', deliverables: '4 AI Photos + 4 Cinematic Videos' },
+        'scale_ugc': { cardKey: 'scale', package: 'Brand Scale Domination', track: 'UGC Essentials', price: '$199', deliverables: '8 AI Photos + 8 UGC Videos' },
+        'scale_cinematic': { cardKey: 'scale', package: 'Brand Scale Domination', track: 'Cinematic Flagship', price: '$299', deliverables: '8 AI Photos + 8 Cinematic Videos' }
       };
 
       if (planMap[val]) {
-        currentSelectedOrder = Object.assign({ dropdownVal: val }, planMap[val]);
-        syncOrderToForm();
+        var info = planMap[val];
+        selectSubTier(info.cardKey, info.track, info.price, info.deliverables);
       }
     }
 
@@ -5287,7 +5306,8 @@
       }
 
       function resizeCanvas() {
-        var dpr = window.devicePixelRatio || 1;
+        var isMobile = window.innerWidth <= 768;
+        var dpr = isMobile ? 1 : (window.devicePixelRatio || 1);
         canvas.width = Math.round(window.innerWidth * dpr);
         canvas.height = Math.round(window.innerHeight * dpr);
         drawFrameByIndex(lastIndex >= 0 ? lastIndex : 0, true);
@@ -5303,7 +5323,7 @@
         var nx = (cw - nw) / 2;
         var ny = isMobile ? 0 : (ch - nh) / 2;
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
+        ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
         ctx.drawImage(img, nx, ny, nw, nh);
       }
 
@@ -5347,6 +5367,11 @@
       }
 
       function preload() {
+        var isMobile = window.innerWidth <= 768;
+        // On mobile: load every 2nd frame (150 frames total) for zero lag & light memory
+        var step = isMobile ? 2 : 1;
+
+        // Frame 0 loaded immediately with top priority
         var f0 = new Image();
         f0.src = getFrameUrl(0);
         f0.onload = function () {
@@ -5356,20 +5381,41 @@
         };
         frames[0] = f0;
 
-        for (var i = 1; i < TOTAL_FRAMES; i++) {
-          (function (idx) {
-            var img = new Image();
-            img.src = getFrameUrl(idx);
-            img.onload = function () {
-              loaded[idx] = true;
+        // Lazy-batch frame preloading with requestAnimationFrame throttling
+        var batchIndex = step;
+        function queueBatch() {
+          var batchLimit = isMobile ? 8 : 20;
+          for (var count = 0; count < batchLimit && batchIndex < TOTAL_FRAMES; count++, batchIndex += step) {
+            (function (idx) {
+              var img = new Image();
+              img.src = getFrameUrl(idx);
+              img.onload = function () {
+                loaded[idx] = true;
+                frames[idx] = img;
+                var curIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.round(currentProgress * (TOTAL_FRAMES - 1))));
+                if (curIdx === idx || Math.abs(curIdx - idx) <= step) {
+                  drawFrameByIndex(curIdx, false);
+                }
+              };
               frames[idx] = img;
-              var curIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.round(currentProgress * (TOTAL_FRAMES - 1))));
-              if (curIdx === idx) drawFrameByIndex(idx, true);
-            };
-            frames[idx] = img;
-          })(i);
+            })(batchIndex);
+          }
+
+          if (batchIndex < TOTAL_FRAMES) {
+            requestAnimationFrame(queueBatch);
+          }
         }
+
+        requestAnimationFrame(queueBatch);
       }
+
+      // Ensure all portfolio video tags enforce preload="metadata" on mobile
+      try {
+        var vids = document.querySelectorAll('video');
+        vids.forEach(function (v) {
+          v.setAttribute('preload', 'metadata');
+        });
+      } catch (e) {}
 
       window.addEventListener('resize', resizeCanvas);
       window.addEventListener('scroll', onScroll, { passive: true });

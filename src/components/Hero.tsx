@@ -174,7 +174,7 @@ export default function Hero() {
               />
               <Chip
                 icon={<Play size={13} />}
-                label="4K · 9:16 ready"
+                label="Full HD (1080p) · 9:16 ready"
                 className="float-slow absolute left-[-2%] top-[54%] sm:left-[3%]"
               />
             </div>
