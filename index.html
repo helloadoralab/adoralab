@@ -175,6 +175,7 @@
       list-style: none;
     }
 
+    .nav-ios-pill,
     .nav-sliding-pill {
       position: absolute;
       top: 0;
@@ -186,11 +187,12 @@
       border-radius: 999px;
       box-shadow: 0 4px 18px rgba(30, 111, 255, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
       will-change: transform, width, height;
-      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                  width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                  height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                  width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
                   opacity 0.25s ease;
       opacity: 0;
+      transform-origin: center center;
     }
 
     .nav-pill-item {
@@ -207,11 +209,12 @@
       border: 1px solid transparent;
       user-select: none;
       -webkit-user-select: none;
+      background: transparent !important;
     }
 
     .nav-pill-item:hover {
       color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.08) !important;
       border-color: rgba(255, 255, 255, 0.12);
     }
 
@@ -221,9 +224,9 @@
 
     .nav-pill-item.active-pill {
       color: #ffffff;
-      background: transparent;
-      border: 1px solid transparent;
-      box-shadow: none;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      box-shadow: none !important;
     }
 
     .pill-menu-btn {
@@ -2687,11 +2690,12 @@
       border-radius: 999px;
       box-shadow: 0 4px 18px rgba(30, 111, 255, 0.45);
       will-change: transform, width, height;
-      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                  width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                  height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                  width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
                   opacity 0.25s ease;
       opacity: 0;
+      transform-origin: center center;
     }
 
     .legal-tab-btn {
@@ -2978,11 +2982,12 @@
       border-radius: 999px;
       box-shadow: 0 4px 18px rgba(30, 111, 255, 0.45);
       will-change: transform, width, height;
-      transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                  width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                  height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+      transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                  width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
                   opacity 0.25s ease;
       opacity: 0;
+      transform-origin: center center;
     }
 
     .vault-tab-btn {
@@ -3839,7 +3844,7 @@
   <div class="nav-pill-wrapper">
     <header class="pill-navbar">
       <!-- Left: Logo Circle + ADORA LAB (Click scrolls smoothly to top) -->
-      <a href="#portfolio" class="pill-brand" onclick="event.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); history.replaceState(null, '', '#portfolio');" title="Adora Lab — Scroll to Top">
+      <a href="#portfolio" class="pill-brand" onclick="event.preventDefault(); window.navScrollToSection ? window.navScrollToSection('portfolio') : window.scrollTo({ top: 0, behavior: 'smooth' }); history.replaceState(null, '', '#portfolio');" title="Adora Lab — Scroll to Top">
         <div class="pill-logo-circle">
           <img src="/images/adora-lab-logo.jpg" alt="Adora Lab Logo" class="pill-logo-img" />
         </div>
@@ -3849,7 +3854,7 @@
       <!-- Center: Navigation Links -->
       <nav>
         <ul class="pill-nav-links">
-          <li class="nav-sliding-pill" id="navSlidingPill" aria-hidden="true"></li>
+          <span class="nav-ios-pill nav-sliding-pill" id="navSlidingPill" aria-hidden="true"></span>
           <li><a href="#portfolio" class="nav-pill-item active-pill">Portfolio</a></li>
           <li><a href="#showcase" class="nav-pill-item">Services</a></li>
           <li><a href="#pricing" class="nav-pill-item">Pricing</a></li>
@@ -5326,7 +5331,7 @@
       'https://res.cloudinary.com/gjsyepos/image/upload/v1794070175/CAKE_O_CLOKE_01.png'
     ];
 
-    // ─── LIQUID MORPH SLIDING PILL ENGINE (HARDWARE-ACCELERATED) ───
+    // ─── LIQUID MORPH SLIDING PILL ENGINE (APPLE iOS DYNAMIC ISLAND PHYSICS) ───
     function moveSlidingPill(container, pill, targetBtn, animate) {
       if (!container || !pill || !targetBtn) return;
       if (targetBtn.offsetWidth === 0 && targetBtn.offsetHeight === 0) return;
@@ -5338,18 +5343,87 @@
       var w = bRect.width;
       var h = bRect.height;
 
-      if (animate === false) {
-        pill.style.transition = 'none';
+      if (pill._stretchTimer) {
+        clearTimeout(pill._stretchTimer);
+        pill._stretchTimer = null;
       }
-      pill.style.width = w + 'px';
-      pill.style.height = h + 'px';
-      pill.style.transform = 'translate3d(' + Math.round(x) + 'px, ' + Math.round(y) + 'px, 0)';
-      pill.style.opacity = '1';
 
       if (animate === false) {
+        pill.style.transition = 'none';
+        pill.style.width = w + 'px';
+        pill.style.height = h + 'px';
+        pill.style.transform = 'translate3d(' + Math.round(x) + 'px, ' + Math.round(y) + 'px, 0) scale(1, 1)';
+        pill.style.opacity = '1';
         void pill.offsetWidth;
         pill.style.transition = '';
+        pill._lastX = x;
+        return;
       }
+
+      var prevX = typeof pill._lastX === 'number' ? pill._lastX : x;
+      var dist = Math.abs(x - prevX);
+
+      pill.style.width = w + 'px';
+      pill.style.height = h + 'px';
+      pill.style.opacity = '1';
+
+      if (dist > 18) {
+        // iOS Dynamic Island liquid stretch effect mid-flight:
+        // briefly scale scaleX(1.06) scaleY(0.94) and settle back to scale(1) at destination
+        pill.style.transform = 'translate3d(' + Math.round(x) + 'px, ' + Math.round(y) + 'px, 0) scale(1.06, 0.94)';
+        pill._stretchTimer = setTimeout(function () {
+          pill.style.transform = 'translate3d(' + Math.round(x) + 'px, ' + Math.round(y) + 'px, 0) scale(1, 1)';
+          pill._stretchTimer = null;
+        }, 220);
+      } else {
+        pill.style.transform = 'translate3d(' + Math.round(x) + 'px, ' + Math.round(y) + 'px, 0) scale(1, 1)';
+      }
+
+      pill._lastX = x;
+    }
+
+    // ─── CUSTOM BUTTER-SMOOTH iOS PAGE SCROLL (ZERO-LAG 650ms RAF) ───
+    var isNavClickScrolling = false;
+    var navClickUnlockTimer = null;
+    var navScrollAnimId = null;
+
+    function smoothScrollTo(targetY, duration, onComplete) {
+      if (navScrollAnimId) {
+        cancelAnimationFrame(navScrollAnimId);
+        navScrollAnimId = null;
+      }
+      var startY = window.pageYOffset || document.documentElement.scrollTop;
+      var diff = targetY - startY;
+      if (Math.abs(diff) < 2) {
+        window.scrollTo(0, targetY);
+        if (onComplete) onComplete();
+        return;
+      }
+
+      var startTime = performance.now();
+      var dur = duration || 650;
+
+      // Authentic iOS easeInOutCubic curve for smooth gliding
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function step(now) {
+        var elapsed = now - startTime;
+        var progress = Math.min(elapsed / dur, 1);
+        var ease = easeInOutCubic(progress);
+        window.scrollTo(0, Math.round(startY + diff * ease));
+
+        if (progress < 1) {
+          navScrollAnimId = requestAnimationFrame(step);
+        } else {
+          window.scrollTo(0, targetY);
+          navScrollAnimId = null;
+          if (onComplete) onComplete();
+        }
+      }
+
+      navScrollAnimId = requestAnimationFrame(step);
     }
 
     // ─── NAVBAR ACTIVE PILL SCROLLSPY & UNIFIED TOP ANCHOR ───
@@ -5382,6 +5456,63 @@
         if (activeLink) setActivePill(activeLink, animate);
       }
 
+      window.navScrollToSection = function (targetId) {
+        var targetLink = document.querySelector('.pill-nav-links a[href="#' + targetId + '"]');
+        if (!targetLink && targetId === 'hero') {
+          targetLink = sections[0].link;
+        }
+        var targetEl = document.getElementById(targetId);
+
+        // a) Set isNavClickScrolling = true to temporarily pause/ignore the scroll-spy listener
+        isNavClickScrolling = true;
+        if (navClickUnlockTimer) clearTimeout(navClickUnlockTimer);
+
+        // b) Immediately glide the floating blue pill DIRECTLY to the clicked target tab in one single continuous motion
+        if (targetLink) {
+          setActivePill(targetLink, true);
+        }
+
+        // Calculate target scroll offset
+        var targetY = 0;
+        if (targetId && targetId !== 'portfolio' && targetId !== 'hero' && targetEl) {
+          var navbar = document.querySelector('.pill-navbar') || document.querySelector('.nav-pill-wrapper');
+          var navHeight = navbar ? navbar.offsetHeight + 16 : 80;
+          var rect = targetEl.getBoundingClientRect();
+          var currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+          targetY = Math.max(0, rect.top + currentScrollY - navHeight);
+        }
+
+        if (history.pushState) {
+          history.pushState(null, '', '#' + targetId);
+        }
+
+        // c) Custom butter-smooth page scroll (650ms duration) and unlock afterwards
+        smoothScrollTo(targetY, 650, function () {
+          if (navClickUnlockTimer) clearTimeout(navClickUnlockTimer);
+          navClickUnlockTimer = setTimeout(function () {
+            isNavClickScrolling = false;
+          }, 100);
+        });
+
+        navClickUnlockTimer = setTimeout(function () {
+          isNavClickScrolling = false;
+        }, 850);
+      };
+
+      // Yield programmatic scroll gracefully if user manually touches or scrolls
+      function abortNavScroll() {
+        if (isNavClickScrolling) {
+          if (navScrollAnimId) {
+            cancelAnimationFrame(navScrollAnimId);
+            navScrollAnimId = null;
+          }
+          if (navClickUnlockTimer) clearTimeout(navClickUnlockTimer);
+          isNavClickScrolling = false;
+        }
+      }
+      window.addEventListener('wheel', abortNavScroll, { passive: true });
+      window.addEventListener('touchmove', abortNavScroll, { passive: true });
+
       if (document.readyState === 'complete') {
         updateActivePillPos(false);
       } else {
@@ -5398,16 +5529,24 @@
       });
 
       navLinks.forEach(function (link) {
-        link.addEventListener('click', function () {
-          setActivePill(link, true);
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          var href = link.getAttribute('href');
+          var targetId = href ? href.replace(/^#/, '') : 'portfolio';
+          window.navScrollToSection(targetId);
         });
       });
 
       var scrollTimer = null;
       window.addEventListener('scroll', function () {
+        // PAUSE/IGNORE scroll-spy while programmatic nav click scrolling is active
+        if (isNavClickScrolling) return;
+
         if (scrollTimer) return;
         scrollTimer = setTimeout(function () {
           scrollTimer = null;
+          if (isNavClickScrolling) return;
+
           var scrollY = window.pageYOffset || document.documentElement.scrollTop;
           if (scrollY < 220) {
             setActivePill(sections[0].link, true);
@@ -5451,8 +5590,12 @@
 
     function triggerDrawerProject() {
       closeDrawer();
-      var c = document.getElementById('contact');
-      if (c) c.scrollIntoView({ behavior: 'smooth' });
+      if (window.navScrollToSection) {
+        window.navScrollToSection('contact');
+      } else {
+        var c = document.getElementById('contact');
+        if (c) c.scrollIntoView({ behavior: 'smooth' });
+      }
     }
 
     // ─── 0. SILENT PURCHASING POWER PARITY (PPP) PRICING ENGINE ───
