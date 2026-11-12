@@ -9,11 +9,39 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>Adora Lab — AI Commercial &amp; UGC Content Studio</title>
 
-  <!-- Official Adora Lab Browser Favicon & Mobile App Icons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=3" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=3" />
-  <link rel="shortcut icon" href="/favicon.ico?v=3" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
+  <!-- Official Adora Lab Cloudinary Circular Favicon & Mobile App Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="https://res.cloudinary.com/gjsyepos/image/upload/w_32,h_32,c_fill,r_max,f_png/v1794463180/muse-image_a_ishe_charo_aur_se_ce.png?v=5" />
+  <link rel="icon" type="image/png" sizes="64x64" href="https://res.cloudinary.com/gjsyepos/image/upload/w_64,h_64,c_fill,r_max,f_png/v1794463180/muse-image_a_ishe_charo_aur_se_ce.png?v=5" />
+  <link rel="shortcut icon" type="image/png" href="https://res.cloudinary.com/gjsyepos/image/upload/w_64,h_64,c_fill,r_max,f_png/v1794463180/muse-image_a_ishe_charo_aur_se_ce.png?v=5" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/gjsyepos/image/upload/w_180,h_180,c_fill,r_max,f_png/v1794463180/muse-image_a_ishe_charo_aur_se_ce.png?v=5" />
+  <script>
+    (function () {
+      var favUrl = 'https://res.cloudinary.com/gjsyepos/image/upload/w_64,h_64,c_fill,r_max,f_png/v1794463180/muse-image_a_ishe_charo_aur_se_ce.png?v=5';
+      function setDynamicFavicon() {
+        try {
+          var links = document.querySelectorAll("link[rel*='icon']");
+          links.forEach(function (l) {
+            l.href = favUrl;
+          });
+          var icon = document.querySelector("link[rel='icon']");
+          if (!icon) {
+            icon = document.createElement('link');
+            icon.rel = 'icon';
+            icon.type = 'image/png';
+            icon.href = favUrl;
+            document.head.appendChild(icon);
+          } else {
+            icon.href = favUrl;
+          }
+        } catch (e) {}
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setDynamicFavicon);
+      } else {
+        setDynamicFavicon();
+      }
+    })();
+  </script>
   <meta name="theme-color" content="#0A0F2C">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
